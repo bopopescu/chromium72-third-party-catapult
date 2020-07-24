@@ -11,7 +11,7 @@ from dashboard.pinpoint.models.quest import quest
 from dashboard.services import buildbucket_service
 
 
-BUCKET = 'master.tryserver.chromium.perf'
+BUCKET = 'main.tryserver.chromium.perf'
 
 
 class BuildError(Exception):

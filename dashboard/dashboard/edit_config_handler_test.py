@@ -28,33 +28,33 @@ class EditConfigHandlerTest(testing_common.TestCase):
 
   def _AddSampleTestData(self):
     """Adds some sample data used in the tests below."""
-    master = graph_data.Master(id='TheMaster').put()
-    graph_data.Bot(id='TheBot', parent=master).put()
-    t = graph_data.TestMetadata(id='TheMaster/TheBot/Suite1')
+    main = graph_data.Main(id='TheMain').put()
+    graph_data.Bot(id='TheBot', parent=main).put()
+    t = graph_data.TestMetadata(id='TheMain/TheBot/Suite1')
     t.UpdateSheriff()
     t.put()
 
-    t = graph_data.TestMetadata(id='TheMaster/TheBot/Suite2')
-    t.UpdateSheriff()
-    t.put()
-
-    t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite1/aaa', has_rows=True)
+    t = graph_data.TestMetadata(id='TheMain/TheBot/Suite2')
     t.UpdateSheriff()
     t.put()
 
     t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite1/bbb', has_rows=True)
+        id='TheMain/TheBot/Suite1/aaa', has_rows=True)
     t.UpdateSheriff()
     t.put()
 
     t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite2/ccc', has_rows=True)
+        id='TheMain/TheBot/Suite1/bbb', has_rows=True)
     t.UpdateSheriff()
     t.put()
 
     t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite2/ddd', has_rows=True)
+        id='TheMain/TheBot/Suite2/ccc', has_rows=True)
+    t.UpdateSheriff()
+    t.put()
+
+    t = graph_data.TestMetadata(
+        id='TheMain/TheBot/Suite2/ddd', has_rows=True)
     t.UpdateSheriff()
     t.put()
 
@@ -78,7 +78,7 @@ class EditConfigHandlerTest(testing_common.TestCase):
         edit_config_handler._SplitPatternLines('A/b/c/d\n\nE/f/g/h\n'))
 
   def testSplitPatternLines_NoSlashes_RaisesError(self):
-    # A valid test path must contain a master, bot, and test part.
+    # A valid test path must contain a main, bot, and test part.
     with self.assertRaises(request_handler.InvalidInputError):
       edit_config_handler._SplitPatternLines('invalid')
 
@@ -109,7 +109,7 @@ class EditConfigHandlerTest(testing_common.TestCase):
 
     self.ExecuteDeferredTasks('default')
 
-    mock_add_tests.assert_called_with(['TheMaster/TheBot/Suite1/aaa'])
+    mock_add_tests.assert_called_with(['TheMain/TheBot/Suite1/aaa'])
 
   @mock.patch.object(edit_config_handler, '_AddTestsToPutToTaskQueue')
   def testChangeTestPatterns_OnlyRemove_ReturnsEmptySetAndRemoved(
@@ -121,7 +121,7 @@ class EditConfigHandlerTest(testing_common.TestCase):
 
     self.ExecuteDeferredTasks('default')
 
-    mock_add_tests.assert_called_with(['TheMaster/TheBot/Suite1/bbb'])
+    mock_add_tests.assert_called_with(['TheMain/TheBot/Suite1/bbb'])
 
   @mock.patch.object(edit_config_handler, '_AddTestsToPutToTaskQueue')
   def testChangeTestPatterns_RemoveAndAdd_ReturnsAddedAndRemoved(
@@ -134,8 +134,8 @@ class EditConfigHandlerTest(testing_common.TestCase):
     self.ExecuteDeferredTasks('default')
 
     mock_add_tests.assert_called_with([
-        'TheMaster/TheBot/Suite1/aaa', 'TheMaster/TheBot/Suite2/ccc',
-        'TheMaster/TheBot/Suite2/ddd'])
+        'TheMain/TheBot/Suite1/aaa', 'TheMain/TheBot/Suite2/ccc',
+        'TheMain/TheBot/Suite2/ddd'])
 
   @mock.patch.object(edit_config_handler, '_AddTestsToPutToTaskQueue')
   def testChangeTestPatterns_CanTakeSetsAsArguments(self, mock_add_tests):
@@ -145,7 +145,7 @@ class EditConfigHandlerTest(testing_common.TestCase):
 
     self.ExecuteDeferredTasks('default')
 
-    mock_add_tests.assert_called_with(['TheMaster/TheBot/Suite1/aaa'])
+    mock_add_tests.assert_called_with(['TheMain/TheBot/Suite1/aaa'])
 
   def testComputeDeltas_Empty(self):
     self.assertEqual((set(), set()), edit_config_handler._ComputeDeltas([], []))

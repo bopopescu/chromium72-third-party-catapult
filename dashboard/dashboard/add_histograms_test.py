@@ -37,7 +37,7 @@ def SetGooglerOAuth(mock_oauth):
 
 
 def _CreateHistogram(
-    name='hist', master=None, bot=None, benchmark=None,
+    name='hist', main=None, bot=None, benchmark=None,
     device=None, owner=None, stories=None, story_tags=None,
     benchmark_description=None, commit_position=None, summary_options=None,
     samples=None, max_samples=None, is_ref=False, is_summary=None,
@@ -52,10 +52,10 @@ def _CreateHistogram(
       hists[0].AddSample(s)
 
   histograms = histogram_set.HistogramSet(hists)
-  if master:
+  if main:
     histograms.AddSharedDiagnosticToAllHistograms(
         reserved_infos.MASTERS.name,
-        generic_set.GenericSet([master]))
+        generic_set.GenericSet([main]))
   if bot:
     histograms.AddSharedDiagnosticToAllHistograms(
         reserved_infos.BOTS.name,
@@ -177,7 +177,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
   @mock.patch.object(add_histograms_queue.find_anomalies, 'ProcessTestsAsync')
   def testPost_Succeeds(self, mock_process_test, mock_graph_revisions):
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark', commit_position=123,
+        main='main', bot='bot', benchmark='benchmark', commit_position=123,
         benchmark_description='Benchmark description.', samples=[1, 2, 3])
     data = json.dumps(hs.AsDicts())
     sheriff.Sheriff(
@@ -211,7 +211,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
   @mock.patch.object(add_histograms_queue.find_anomalies, 'ProcessTestsAsync')
   def testPost_ZlibSucceeds(self, mock_process_test, mock_graph_revisions):
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark', commit_position=123,
+        main='main', bot='bot', benchmark='benchmark', commit_position=123,
         benchmark_description='Benchmark description.', samples=[1, 2, 3])
     data = zlib.compress(json.dumps(hs.AsDicts()))
     sheriff.Sheriff(
@@ -248,7 +248,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
       mock.MagicMock())
   def testPost_BuildUrls_Added(self):
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark', commit_position=123,
+        main='main', bot='bot', benchmark='benchmark', commit_position=123,
         benchmark_description='Benchmark description.', samples=[1, 2, 3],
         build_url='http://foo')
     data = zlib.compress(json.dumps(hs.AsDicts()))
@@ -262,7 +262,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_NotZlib_Fails(self):
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark', commit_position=123,
+        main='main', bot='bot', benchmark='benchmark', commit_position=123,
         benchmark_description='Benchmark description.', samples=[1, 2, 3])
     data = json.dumps(hs.AsDicts())
 
@@ -276,7 +276,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
       mock.MagicMock())
   def testPost_BenchmarkTotalDuration_Filtered(self):
     hs = _CreateHistogram(
-        name='benchmark_total_duration', master='master', bot='bot',
+        name='benchmark_total_duration', main='main', bot='bot',
         benchmark='v8.browsing', commit_position=123, samples=[1], is_ref=True)
     data = json.dumps(hs.AsDicts())
 
@@ -292,7 +292,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_PurgesBinData(self):
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', commit_position=1)
+        main='m', bot='b', benchmark='s', commit_position=1)
     b = breakdown.Breakdown()
     dm = histogram_module.DiagnosticMap()
     dm['breakdown'] = b
@@ -309,9 +309,9 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
       for dm in b.diagnostic_maps:
         self.assertEqual(0, len(dm))
 
-  def testPost_IllegalMasterName_Fails(self):
+  def testPost_IllegalMainName_Fails(self):
     hs = _CreateHistogram(
-        master='m/m', bot='b', benchmark='s', commit_position=1, samples=[1])
+        main='m/m', bot='b', benchmark='s', commit_position=1, samples=[1])
     data = json.dumps(hs.AsDicts())
 
     response = self.PostAddHistogramProcess(data)
@@ -319,7 +319,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_IllegalBotName_Fails(self):
     hs = _CreateHistogram(
-        master='m', bot='b/b', benchmark='s', commit_position=1, samples=[1])
+        main='m', bot='b/b', benchmark='s', commit_position=1, samples=[1])
     data = json.dumps(hs.AsDicts())
 
     response = self.PostAddHistogramProcess(data)
@@ -327,7 +327,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_IllegalSuiteName_Fails(self):
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s/s', commit_position=1, samples=[1])
+        main='m', bot='b', benchmark='s/s', commit_position=1, samples=[1])
     data = json.dumps(hs.AsDicts())
 
     response = self.PostAddHistogramProcess(data)
@@ -335,9 +335,9 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_DuplicateHistogram_Fails(self):
     hs1 = _CreateHistogram(
-        master='m', bot='b', benchmark='s', commit_position=1, samples=[1])
+        main='m', bot='b', benchmark='s', commit_position=1, samples=[1])
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', commit_position=1, samples=[1])
+        main='m', bot='b', benchmark='s', commit_position=1, samples=[1])
     hs.ImportDicts(hs1.AsDicts())
     data = json.dumps(hs.AsDicts())
 
@@ -353,7 +353,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
   def testPost_EmptyHistogram_NotAdded(
       self, mock_process_test, mock_graph_revisions):
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', name='foo', commit_position=1,
+        main='m', bot='b', benchmark='s', name='foo', commit_position=1,
         samples=[])
     data = json.dumps(hs.AsDicts())
 
@@ -380,7 +380,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     sheriff.Sheriff(
         id='ref_sheriff', email='a@chromium.org', patterns=['*/*/*/*']).put()
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=424242, stories=['abcd'], samples=[1, 2, 3],
         is_ref=True)
     data = json.dumps(hs.AsDicts())
@@ -396,7 +396,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     sheriff.Sheriff(
         id='ref_sheriff', email='a@chromium.org', patterns=['*/*/*/*']).put()
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=424242, stories=['ref'], samples=[1, 2, 3])
     data = json.dumps(hs.AsDicts())
     self.PostAddHistogram({'data': data})
@@ -410,7 +410,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     sheriff.Sheriff(
         id='ref_sheriff', email='a@chromium.org', patterns=['*/*/*/*']).put()
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=424242, stories=['_ref_abcd'], samples=[1, 2, 3])
     data = json.dumps(hs.AsDicts())
     self.PostAddHistogram({'data': data})
@@ -426,7 +426,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
       mock.MagicMock())
   def testPost_DeduplicateByName(self):
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', stories=['s1', 's2'],
+        main='m', bot='b', benchmark='s', stories=['s1', 's2'],
         commit_position=1111, device='device1', owner='owner1', samples=[42])
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
     self.ExecuteTaskQueueTasks('/add_histograms_queue',
@@ -437,7 +437,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     self.assertEqual(6, len(diagnostics))
 
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', stories=['s1', 's2'],
+        main='m', bot='b', benchmark='s', stories=['s1', 's2'],
         commit_position=1112, device='device1', owner='owner1', samples=[42])
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
     self.ExecuteTaskQueueTasks('/add_histograms_queue',
@@ -448,7 +448,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     self.assertEqual(6, len(diagnostics))
 
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', stories=['s1', 's2'],
+        main='m', bot='b', benchmark='s', stories=['s1', 's2'],
         commit_position=1113, device='device2', owner='owner1', samples=[42])
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
     self.ExecuteTaskQueueTasks('/add_histograms_queue',
@@ -459,7 +459,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     self.assertEqual(7, len(diagnostics))
 
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', stories=['s1', 's2'],
+        main='m', bot='b', benchmark='s', stories=['s1', 's2'],
         commit_position=1114, device='device2', owner='owner2')
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
     self.ExecuteTaskQueueTasks('/add_histograms_queue',
@@ -470,7 +470,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     self.assertEqual(8, len(diagnostics))
 
     hs = _CreateHistogram(
-        master='m', bot='b', benchmark='s', stories=['s1', 's2'],
+        main='m', bot='b', benchmark='s', stories=['s1', 's2'],
         commit_position=1115, device='device2', owner='owner2', samples=[42])
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
     self.ExecuteTaskQueueTasks('/add_histograms_queue',
@@ -488,7 +488,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
       mock.MagicMock())
   def testPost_NamesAreSet(self):
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=12345, device='foo', samples=[42])
 
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
@@ -511,7 +511,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def _TestDiagnosticsInternalOnly(self):
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=12345)
 
     self.PostAddHistogram({'data': json.dumps(hs.AsDicts())})
@@ -525,7 +525,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
       add_histograms_queue.find_anomalies, 'ProcessTestsAsync',
       mock.MagicMock())
   def testPost_DiagnosticsInternalOnly_False(self):
-    graph_data.Bot(key=ndb.Key('Master', 'master', 'Bot', 'bot'),
+    graph_data.Bot(key=ndb.Key('Main', 'main', 'Bot', 'bot'),
                    internal_only=False).put()
     self._TestDiagnosticsInternalOnly()
 
@@ -548,7 +548,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_SetsCorrectTestPathForSummary(self):
     histograms = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=12345, device='device_foo', stories=['story'],
         story_tags=['group:media', 'case:browse'], is_summary=['name'],
         samples=[42])
@@ -560,14 +560,14 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     tests = graph_data.TestMetadata.query().fetch()
 
     expected = [
-        'master/bot/benchmark',
-        'master/bot/benchmark/hist',
-        'master/bot/benchmark/hist_avg',
-        'master/bot/benchmark/hist_count',
-        'master/bot/benchmark/hist_max',
-        'master/bot/benchmark/hist_min',
-        'master/bot/benchmark/hist_std',
-        'master/bot/benchmark/hist_sum',
+        'main/bot/benchmark',
+        'main/bot/benchmark/hist',
+        'main/bot/benchmark/hist_avg',
+        'main/bot/benchmark/hist_count',
+        'main/bot/benchmark/hist_max',
+        'main/bot/benchmark/hist_min',
+        'main/bot/benchmark/hist_std',
+        'main/bot/benchmark/hist_sum',
     ]
 
     for test in tests:
@@ -577,7 +577,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_SetsCorrectTestPathForTIRLabelSummary(self):
     histograms = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=12345, device='device_foo', stories=['story'],
         story_tags=['group:media', 'case:browse'],
         is_summary=['name', 'storyTags'], samples=[42])
@@ -589,21 +589,21 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
     tests = graph_data.TestMetadata.query().fetch()
 
     expected = [
-        'master/bot/benchmark',
-        'master/bot/benchmark/hist',
-        'master/bot/benchmark/hist/browse_media',
-        'master/bot/benchmark/hist_avg',
-        'master/bot/benchmark/hist_avg/browse_media',
-        'master/bot/benchmark/hist_count',
-        'master/bot/benchmark/hist_count/browse_media',
-        'master/bot/benchmark/hist_max',
-        'master/bot/benchmark/hist_max/browse_media',
-        'master/bot/benchmark/hist_min',
-        'master/bot/benchmark/hist_min/browse_media',
-        'master/bot/benchmark/hist_std',
-        'master/bot/benchmark/hist_std/browse_media',
-        'master/bot/benchmark/hist_sum',
-        'master/bot/benchmark/hist_sum/browse_media',
+        'main/bot/benchmark',
+        'main/bot/benchmark/hist',
+        'main/bot/benchmark/hist/browse_media',
+        'main/bot/benchmark/hist_avg',
+        'main/bot/benchmark/hist_avg/browse_media',
+        'main/bot/benchmark/hist_count',
+        'main/bot/benchmark/hist_count/browse_media',
+        'main/bot/benchmark/hist_max',
+        'main/bot/benchmark/hist_max/browse_media',
+        'main/bot/benchmark/hist_min',
+        'main/bot/benchmark/hist_min/browse_media',
+        'main/bot/benchmark/hist_std',
+        'main/bot/benchmark/hist_std/browse_media',
+        'main/bot/benchmark/hist_sum',
+        'main/bot/benchmark/hist_sum/browse_media',
     ]
 
     for test in tests:
@@ -613,7 +613,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
   def testPost_SetsCorrectTestPathForNonSummary(self):
     histograms = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=12345, device='device_foo', stories=['story'],
         is_summary=None, samples=[42])
 
@@ -623,11 +623,11 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
     tests = [t.key.id() for t in graph_data.TestMetadata.query().fetch()]
     self.assertEqual(15, len(tests))  # suite + hist + stats + story per stat
-    self.assertIn('master/bot/benchmark/hist/story', tests)
+    self.assertIn('main/bot/benchmark/hist/story', tests)
 
   def testPost_SetsCorrectTestPathForSummaryAbsent(self):
     histograms = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=12345, device='device_foo', stories=['story'],
         samples=[42])
 
@@ -637,7 +637,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
 
     tests = [t.key.id() for t in graph_data.TestMetadata.query().fetch()]
     self.assertEqual(15, len(tests))
-    self.assertIn('master/bot/benchmark/hist/story', tests)
+    self.assertIn('main/bot/benchmark/hist/story', tests)
 
   def _AddAtCommit(self, commit_position, device, owner):
     opts = {
@@ -649,7 +649,7 @@ class AddHistogramsEndToEndTest(AddHistogramsBaseTest):
         'sum': False
     }
     hs = _CreateHistogram(
-        master='master', bot='bot', benchmark='benchmark',
+        main='main', bot='bot', benchmark='benchmark',
         commit_position=commit_position, summary_options=opts,
         device=device, owner=owner, samples=[1])
 
@@ -739,7 +739,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
     histograms = histogram_set.HistogramSet(hists)
     histograms.AddSharedDiagnosticToAllHistograms(
         reserved_infos.MASTERS.name,
-        generic_set.GenericSet(['master']))
+        generic_set.GenericSet(['main']))
     histograms.AddSharedDiagnosticToAllHistograms(
         reserved_infos.BOTS.name,
         generic_set.GenericSet(['bot']))
@@ -770,7 +770,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
     histograms = histogram_set.HistogramSet(hists)
     histograms.AddSharedDiagnosticToAllHistograms(
         reserved_infos.MASTERS.name,
-        generic_set.GenericSet(['master']))
+        generic_set.GenericSet(['main']))
     histograms.AddSharedDiagnosticToAllHistograms(
         reserved_infos.BOTS.name,
         generic_set.GenericSet(['bot']))
@@ -799,7 +799,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -851,13 +851,13 @@ class AddHistogramsTest(AddHistogramsBaseTest):
 
     self.assertEqual(2, len(params_by_guid))
     self.assertEqual(
-        'master/bot/benchmark/foo/story',
+        'main/bot/benchmark/foo/story',
         params_by_guid['4989617a-14d6-4f80-8f75-dafda2ff13b0']['test_path'])
     self.assertEqual(
         424242,
         params_by_guid['4989617a-14d6-4f80-8f75-dafda2ff13b0']['revision'])
     self.assertEqual(
-        'master/bot/benchmark/foo2/story',
+        'main/bot/benchmark/foo2/story',
         params_by_guid['2a714c36-f4ef-488d-8bee-93c7e3149388']['test_path'])
     self.assertEqual(
         424242,
@@ -878,7 +878,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -934,13 +934,13 @@ class AddHistogramsTest(AddHistogramsBaseTest):
 
   def testPostHistogram_AddsNewSparseDiagnostic(self):
     diag_dict = {
-        'values': ['master'],
+        'values': ['main'],
         'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
         'type': 'GenericSet'
     }
     diag = histogram.SparseDiagnostic(
         data=diag_dict, start_revision=1, end_revision=sys.maxint,
-        test=utils.TestKey('master/bot/benchmark'))
+        test=utils.TestKey('main/bot/benchmark'))
     diag.put()
     data = json.dumps([
         {
@@ -952,7 +952,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -989,14 +989,14 @@ class AddHistogramsTest(AddHistogramsBaseTest):
 
   def testPostHistogram_DeduplicatesSameSparseDiagnostic(self):
     diag_dict = {
-        'values': ['master'],
+        'values': ['main'],
         'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
         'type': 'GenericSet'
     }
     diag = histogram.SparseDiagnostic(
         id='e9c2891d-2b04-413f-8cf4-099827e67626', data=diag_dict,
         start_revision=1, end_revision=sys.maxint,
-        test=utils.TestKey('master/bot/benchmark'))
+        test=utils.TestKey('main/bot/benchmark'))
     diag.put()
     data = json.dumps([
         {
@@ -1008,7 +1008,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1051,7 +1051,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '0bc1021b-8107-4db7-bc8c-49d7cf53c5ae',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1096,7 +1096,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '0bc1021b-8107-4db7-bc8c-49d7cf53c5ae',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1127,7 +1127,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1168,7 +1168,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet',
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1224,7 +1224,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
         ['alice@chromium.org'],
         diagnostics_by_name[reserved_infos.OWNERS.name].data['values'])
     self.assertEqual(
-        ['master'],
+        ['main'],
         diagnostics_by_name[reserved_infos.MASTERS.name].data['values'])
     self.assertEqual('cabb59fe-4bcf-4512-881c-d038c7a80635', owners_info)
 
@@ -1244,7 +1244,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet'
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1314,7 +1314,7 @@ class AddHistogramsTest(AddHistogramsBaseTest):
             'guid': '25f0a111-9bb4-4cea-b0c1-af2609623160',
             'type': 'GenericSet'
         }, {
-            'values': ['master'],
+            'values': ['main'],
             'guid': 'e9c2891d-2b04-413f-8cf4-099827e67626',
             'type': 'GenericSet'
         }, {
@@ -1375,15 +1375,15 @@ class AddHistogramsTest(AddHistogramsBaseTest):
         generic_set.GenericSet)
 
   def testFindSuiteLevelSparseDiagnostics(self):
-    def _CreateSingleHistogram(hist, master):
+    def _CreateSingleHistogram(hist, main):
       h = histogram_module.Histogram(hist, 'count')
       h.diagnostics[reserved_infos.MASTERS.name] = (
-          generic_set.GenericSet([master]))
+          generic_set.GenericSet([main]))
       return h
 
     histograms = histogram_set.HistogramSet([
-        _CreateSingleHistogram('hist1', 'master1'),
-        _CreateSingleHistogram('hist2', 'master2')])
+        _CreateSingleHistogram('hist1', 'main1'),
+        _CreateSingleHistogram('hist2', 'main2')])
 
     with self.assertRaises(ValueError):
       add_histograms.FindSuiteLevelSparseDiagnostics(

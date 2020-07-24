@@ -76,7 +76,7 @@ class AddHistogramsQueueTest(testing_common.TestCase):
     self.SetCurrentUser('foo@bar.com', is_admin=True)
 
   def testPostHistogram(self):
-    graph_data.Bot(key=ndb.Key('Master', 'Chromium', 'Bot', 'win7'),
+    graph_data.Bot(key=ndb.Key('Main', 'Chromium', 'Bot', 'win7'),
                    internal_only=False).put()
     test_path = 'Chromium/win7/suite/metric'
     params = [{
@@ -93,10 +93,10 @@ class AddHistogramsQueueTest(testing_common.TestCase):
     self.assertEqual(test.units, 'count_biggerIsBetter')
     self.assertEqual(test.improvement_direction, anomaly.UP)
 
-    master = ndb.Key('Master', 'Chromium').get()
-    self.assertIsNotNone(master)
+    main = ndb.Key('Main', 'Chromium').get()
+    self.assertIsNotNone(main)
 
-    bot = ndb.Key('Master', 'Chromium', 'Bot', 'win7').get()
+    bot = ndb.Key('Main', 'Chromium', 'Bot', 'win7').get()
     self.assertIsNotNone(bot)
 
     tests = graph_data.TestMetadata.query().fetch()
@@ -149,7 +149,7 @@ class AddHistogramsQueueTest(testing_common.TestCase):
     self.assertEqual(7, len(rows))
 
   def testPostHistogram_WithFreshDiagnostics(self):
-    graph_data.Bot(key=ndb.Key('Master', 'Chromium', 'Bot', 'win7'),
+    graph_data.Bot(key=ndb.Key('Main', 'Chromium', 'Bot', 'win7'),
                    internal_only=False).put()
     test_path = 'Chromium/win7/suite/metric'
     histogram.HistogramRevisionRecord.GetOrCreate(

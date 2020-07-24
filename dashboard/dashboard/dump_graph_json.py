@@ -41,13 +41,13 @@ class DumpGraphJsonHandler(request_handler.RequestHandler):
     """Dumps data for the requested test.
 
     Request parameters:
-      test_path: A single full test path, including master/bot.
+      test_path: A single full test path, including main/bot.
       num_points: Max number of Row entities (optional).
       end_rev: Ending revision number, inclusive (optional).
 
     Outputs:
       JSON array of encoded protobuf messages, which encode all of
-      the datastore entities relating to one test (including Master, Bot,
+      the datastore entities relating to one test (including Main, Bot,
       TestMetadata, Row, Anomaly and Sheriff entities).
     """
     test_path = self.request.get('test_path')
@@ -93,7 +93,7 @@ class DumpGraphJsonHandler(request_handler.RequestHandler):
 
     Outputs:
       JSON array of encoded protobuf messages, which encode all of
-      the datastore entities relating to one test (including Master, Bot,
+      the datastore entities relating to one test (including Main, Bot,
       TestMetadata, Row, Anomaly and Sheriff entities).
     """
     sheriff_name = self.request.get('sheriff')
@@ -125,7 +125,7 @@ class DumpGraphJsonHandler(request_handler.RequestHandler):
     self.response.out.write(json.dumps(protobuf_strings))
 
   def _GetTestAncestors(self, test_keys):
-    """Gets the TestMetadata, Bot, and Master entities preceding in path."""
+    """Gets the TestMetadata, Bot, and Main entities preceding in path."""
     entities = []
     added_parents = set()
     for test_key in test_keys:
@@ -138,9 +138,9 @@ class DumpGraphJsonHandler(request_handler.RequestHandler):
           continue
         added_parents.add(test_path)
         if index == 0:
-          entities.append(ndb.Key('Master', parts[0]).get())
+          entities.append(ndb.Key('Main', parts[0]).get())
         elif index == 1:
-          entities.append(ndb.Key('Master', parts[0], 'Bot', parts[1]).get())
+          entities.append(ndb.Key('Main', parts[0], 'Bot', parts[1]).get())
         else:
           entities.append(ndb.Key('TestMetadata', test_path).get())
     return [e for e in entities if e is not None]

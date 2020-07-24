@@ -46,7 +46,7 @@ class DatastoreHooksTest(testing_common.TestCase):
             'TestInternal': {'SubTestInternal': {}},
             'TestExternal': {'SubTestExternal': {}},
         })
-    internal_key = ['Master', 'ChromiumPerf', 'Bot', 'FooInternal']
+    internal_key = ['Main', 'ChromiumPerf', 'Bot', 'FooInternal']
     internal_bot = ndb.Key(*internal_key).get()
     internal_bot.internal_only = True
     internal_bot.put()
@@ -143,7 +143,7 @@ class DatastoreHooksTest(testing_common.TestCase):
           tests[3].key.string_id())
 
     tests = graph_data.TestMetadata.query(
-        graph_data.TestMetadata.master_name == 'ChromiumPerf',
+        graph_data.TestMetadata.main_name == 'ChromiumPerf',
         graph_data.TestMetadata.bot_name == 'FooInternal').fetch()
     if include_internal:
       self.assertEqual(4, len(tests))
@@ -192,10 +192,10 @@ class DatastoreHooksTest(testing_common.TestCase):
     self.assertEqual(1, len(bots))
 
   def _CheckGet(self, include_internal):
-    m = ndb.Key('Master', 'ChromiumPerf').get()
+    m = ndb.Key('Main', 'ChromiumPerf').get()
     self.assertEqual(m.key.string_id(), 'ChromiumPerf')
     external_bot = ndb.Key(
-        'Master', 'ChromiumPerf', 'Bot', 'Win7External').get()
+        'Main', 'ChromiumPerf', 'Bot', 'Win7External').get()
     self.assertEqual(external_bot.key.string_id(), 'Win7External')
     external_bot_2 = graph_data.Bot.get_by_id('Win7External', parent=m.key)
     self.assertEqual(external_bot_2.key.string_id(), 'Win7External')
@@ -207,12 +207,12 @@ class DatastoreHooksTest(testing_common.TestCase):
         external_test.key.string_id())
     if include_internal:
       internal_bot = ndb.Key(
-          'Master', 'ChromiumPerf', 'Bot', 'FooInternal').get()
+          'Main', 'ChromiumPerf', 'Bot', 'FooInternal').get()
       self.assertEqual(internal_bot.key.string_id(), 'FooInternal')
       internal_bot_2 = graph_data.Bot.get_by_id('FooInternal', parent=m.key)
       self.assertEqual(internal_bot_2.key.string_id(), 'FooInternal')
     else:
-      k = ndb.Key('Master', 'ChromiumPerf', 'Bot', 'FooInternal')
+      k = ndb.Key('Main', 'ChromiumPerf', 'Bot', 'FooInternal')
       self.assertRaises(AssertionError, k.get)
       self.assertRaises(AssertionError, graph_data.Bot.get_by_id,
                         'FooInternal', parent=m.key)

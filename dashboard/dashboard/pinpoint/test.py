@@ -87,7 +87,7 @@ def _CommitInfoStub(repository_url, git_hash):
       'committer': {'time': 'Fri Jan 01 00:01:00 2018'},
       'message': 'Subject.\n\n'
                  'Commit message.\n'
-                 'Cr-Commit-Position: refs/heads/master@{#123456}',
+                 'Cr-Commit-Position: refs/heads/main@{#123456}',
   }
 
 

@@ -8,21 +8,21 @@ from common.buildbot import builds
 from common.buildbot import network
 
 
-def Builders(master_name):
+def Builders(main_name):
   builder_data = network.FetchData(network.BuildUrl(
-      master_name, 'json/builders'))
-  return sorted(Builder(master_name, builder_name, builder_info)
+      main_name, 'json/builders'))
+  return sorted(Builder(main_name, builder_name, builder_info)
                 for builder_name, builder_info in builder_data.iteritems())
 
 
 class Builder(object):
 
-  def __init__(self, master_name, name, data):
-    self._master_name = master_name
+  def __init__(self, main_name, name, data):
+    self._main_name = main_name
     self._name = name
     self._url = network.BuildUrl(
-        master_name, 'builders/%s' % urllib.quote(self.name))
-    self._builds = builds.Builds(master_name, name, self._url)
+        main_name, 'builders/%s' % urllib.quote(self.name))
+    self._builds = builds.Builds(main_name, name, self._url)
 
     self.Update(data)
 
@@ -35,16 +35,16 @@ class Builder(object):
   def Update(self, data=None):
     if not data:
       data = network.FetchData(network.BuildUrl(
-          self.master_name, 'json/builders/%s' % urllib.quote(self.name)))
+          self.main_name, 'json/builders/%s' % urllib.quote(self.name)))
     self._state = data['state']
     self._pending_build_count = data['pendingBuilds']
     self._current_builds = frozenset(data['currentBuilds'])
     self._cached_builds = frozenset(data['cachedBuilds'])
-    self._slaves = frozenset(data['slaves'])
+    self._subordinates = frozenset(data['subordinates'])
 
   @property
-  def master_name(self):
-    return self._master_name
+  def main_name(self):
+    return self._main_name
 
   @property
   def name(self):
@@ -70,13 +70,13 @@ class Builder(object):
   def current_builds(self):
     """Set of build numbers currently building.
 
-    There may be multiple entries if there are multiple build slaves.
+    There may be multiple entries if there are multiple build subordinates.
     """
     return self._current_builds
 
   @property
   def cached_builds(self):
-    """Set of builds whose data are visible on the master in increasing order.
+    """Set of builds whose data are visible on the main in increasing order.
 
     More builds may be available than this.
     """
@@ -92,5 +92,5 @@ class Builder(object):
     return max(self.available_builds)
 
   @property
-  def slaves(self):
-    return self._slaves
+  def subordinates(self):
+    return self._subordinates

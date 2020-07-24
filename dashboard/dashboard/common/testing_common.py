@@ -214,21 +214,21 @@ class TestCase(unittest.TestCase):
     self.addCleanup(is_internal_user_patcher.stop)
 
 
-def AddTests(masters, bots, tests_dict):
+def AddTests(mains, bots, tests_dict):
   """Adds data to the mock datastore.
 
   Args:
-    masters: List of buildbot master names.
+    mains: List of buildbot main names.
     bots: List of bot names.
     tests_dict: Nested dictionary of tests to add; keys are test names
         and values are nested dictionaries of tests to add.
   """
-  for master_name in masters:
-    master_key = graph_data.Master(id=master_name).put()
+  for main_name in mains:
+    main_key = graph_data.Main(id=main_name).put()
     for bot_name in bots:
-      graph_data.Bot(id=bot_name, parent=master_key).put()
+      graph_data.Bot(id=bot_name, parent=main_key).put()
       for test_name in tests_dict:
-        test_path = '%s/%s/%s' % (master_name, bot_name, test_name)
+        test_path = '%s/%s/%s' % (main_name, bot_name, test_name)
         t = graph_data.TestMetadata(id=test_path)
         t.UpdateSheriff()
         t.put()

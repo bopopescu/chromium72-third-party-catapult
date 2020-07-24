@@ -32,7 +32,7 @@ class AlertsGeneralTest(testing_common.TestCase):
                      timestamp=None,
                      bug_id=None,
                      sheriff_name=None,
-                     test='master/bot/test_suite/measurement/test_case',
+                     test='main/bot/test_suite/measurement/test_case',
                      start_revision=0,
                      end_revision=100,
                      display_start=0,
@@ -99,12 +99,12 @@ class AlertsGeneralTest(testing_common.TestCase):
     self.assertEqual(1, len(response['anomalies']))
     self.assertEqual('android', response['anomalies'][0]['bot'])
 
-  def testMaster(self):
+  def testMain(self):
     self._CreateAnomaly()
     self._CreateAnomaly(test='adept/android/lodging/assessment/story')
-    response = self._Post(master='adept')
+    response = self._Post(main='adept')
     self.assertEqual(1, len(response['anomalies']))
-    self.assertEqual('adept', response['anomalies'][0]['master'])
+    self.assertEqual('adept', response['anomalies'][0]['main'])
 
   def testTestSuite(self):
     self._CreateAnomaly()

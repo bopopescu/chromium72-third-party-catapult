@@ -29,7 +29,7 @@ class TryJob(internal_only_model.InternalOnlyModel):
   email = ndb.StringProperty()
   rietveld_issue_id = ndb.IntegerProperty()
   rietveld_patchset_id = ndb.IntegerProperty()
-  master_name = ndb.StringProperty(default='ChromiumPerf', indexed=False)
+  main_name = ndb.StringProperty(default='ChromiumPerf', indexed=False)
   buildbucket_job_id = ndb.StringProperty()
   internal_only = ndb.BooleanProperty(default=False, indexed=True)
 

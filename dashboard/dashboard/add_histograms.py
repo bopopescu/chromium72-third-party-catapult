@@ -196,7 +196,7 @@ def ProcessHistogramSet(histogram_dicts):
     _PurgeHistogramBinData(histograms)
 
   with timing.WallTimeLogger('_GetDiagnosticValue calls'):
-    master = _GetDiagnosticValue(
+    main = _GetDiagnosticValue(
         reserved_infos.MASTERS.name, histograms.GetFirstHistogram())
     bot = _GetDiagnosticValue(
         reserved_infos.BOTS.name, histograms.GetFirstHistogram())
@@ -206,17 +206,17 @@ def ProcessHistogramSet(histogram_dicts):
         reserved_infos.BENCHMARK_DESCRIPTIONS.name,
         histograms.GetFirstHistogram(), optional=True)
 
-  with timing.WallTimeLogger('_ValidateMasterBotBenchmarkName'):
-    _ValidateMasterBotBenchmarkName(master, bot, benchmark)
+  with timing.WallTimeLogger('_ValidateMainBotBenchmarkName'):
+    _ValidateMainBotBenchmarkName(main, bot, benchmark)
 
   with timing.WallTimeLogger('ComputeRevision'):
-    suite_key = utils.TestKey('%s/%s/%s' % (master, bot, benchmark))
+    suite_key = utils.TestKey('%s/%s/%s' % (main, bot, benchmark))
 
     logging.info('Suite: %s', suite_key.id())
 
     revision = ComputeRevision(histograms)
 
-    internal_only = graph_data.Bot.GetInternalOnlySync(master, bot)
+    internal_only = graph_data.Bot.GetInternalOnlySync(main, bot)
 
   revision_record = histogram.HistogramRevisionRecord.GetOrCreate(
       suite_key, revision)
@@ -238,7 +238,7 @@ def ProcessHistogramSet(histogram_dicts):
     suite_level_sparse_diagnostic_entities = FindSuiteLevelSparseDiagnostics(
         histograms, suite_key, revision, internal_only)
 
-  # TODO(896856): Refactor master/bot computation to happen above this line
+  # TODO(896856): Refactor main/bot computation to happen above this line
   # so that we can replace with a DiagnosticRef rather than a full diagnostic.
   with timing.WallTimeLogger('DeduplicateAndPut'):
     new_guids_to_old_diagnostics = (
@@ -259,8 +259,8 @@ def ProcessHistogramSet(histogram_dicts):
     _QueueHistogramTasks(tasks)
 
 
-def _ValidateMasterBotBenchmarkName(master, bot, benchmark):
-  for n in (master, bot, benchmark):
+def _ValidateMainBotBenchmarkName(main, bot, benchmark):
+  for n in (main, bot, benchmark):
     if '/' in n:
       raise api_request_handler.BadRequestError('Illegal slash in %s' % n)
 

@@ -24,7 +24,7 @@ class BadRequestError(Exception):
 
 
 class ListTestsHandler(request_handler.RequestHandler):
-  """URL endpoint for AJAX requests to list masters, bots, and tests."""
+  """URL endpoint for AJAX requests to list mains, bots, and tests."""
 
   def post(self):
     """Outputs a JSON string of the requested list.
@@ -85,7 +85,7 @@ def GetSubTests(suite_name, bot_names):
 
   Args:
     suite_name: Top level test name.
-    bot_names: List of master/bot names in the form "<master>/<platform>".
+    bot_names: List of main/bot names in the form "<main>/<platform>".
 
   Returns:
     A dict mapping test names to dicts to entries which have the keys
@@ -95,8 +95,8 @@ def GetSubTests(suite_name, bot_names):
   # For some bots, there may be cached data; First collect and combine this.
   combined = {}
   for bot_name in bot_names:
-    master, bot = bot_name.split('/')
-    suite_key = ndb.Key('TestMetadata', '%s/%s/%s' % (master, bot, suite_name))
+    main, bot = bot_name.split('/')
+    suite_key = ndb.Key('TestMetadata', '%s/%s/%s' % (main, bot, suite_name))
 
     cache_key = _ListSubTestCacheKey(suite_key)
     cached = layered_cache.Get(cache_key)
@@ -132,7 +132,7 @@ def _SubTestsDict(paths, deprecated):
 
   Args:
     paths: An iterable of test paths for which there are points. Each test
-        path is of the form "Master/bot/benchmark/chart/...". Each test path
+        path is of the form "Main/bot/benchmark/chart/...". Each test path
         corresponds to a TestMetadata entity for which has_rows is set to True.
     deprecated: Whether test are deprecated.
 
@@ -169,7 +169,7 @@ def _MapTestDescendantsToSubTestPaths(keys):
 
   Returns:
     A list of test paths for all descendant TestMetadata entities that have
-    associated Row entities. These test paths omit the Master/bot/suite part.
+    associated Row entities. These test paths omit the Main/bot/suite part.
   """
   return map(_SubTestPath, keys)
 
@@ -185,8 +185,8 @@ def _SubTestPath(test_key):
 def _ListSubTestCacheKey(test_key):
   """Returns the sub-tests list cache key for a test suite."""
   parts = utils.TestPath(test_key).split('/')
-  master, bot, suite = parts[0:3]
-  return graph_data.LIST_TESTS_SUBTEST_CACHE_KEY % (master, bot, suite)
+  main, bot, suite = parts[0:3]
+  return graph_data.LIST_TESTS_SUBTEST_CACHE_KEY % (main, bot, suite)
 
 
 def _MergeSubTestsDict(a, b):
@@ -222,7 +222,7 @@ def GetTestsMatchingPattern(
 
   For this function, it's assumed that a test path should only have up to seven
   parts. In theory, tests can be arbitrarily nested, but in practice, tests
-  are usually structured as master/bot/suite/graph/trace, and only a few have
+  are usually structured as main/bot/suite/graph/trace, and only a few have
   seven parts.
 
   Args:
@@ -244,7 +244,7 @@ def GetTestsMatchingPattern(
 def GetTestsMatchingPatternAsync(
     pattern, only_with_rows=False, list_entities=False, use_cache=True):
   property_names = [
-      'master_name', 'bot_name', 'suite_name', 'test_part1_name',
+      'main_name', 'bot_name', 'suite_name', 'test_part1_name',
       'test_part2_name', 'test_part3_name', 'test_part4_name',
       'test_part5_name']
   pattern_parts = pattern.split('/')
@@ -319,7 +319,7 @@ def GetTestDescendantsAsync(
   """
   test_parts = utils.TestPath(test_key).split('/')
   query_parts = [
-      ('master_name', test_parts[0]),
+      ('main_name', test_parts[0]),
       ('bot_name', test_parts[1]),
       ('suite_name', test_parts[2]),
   ]

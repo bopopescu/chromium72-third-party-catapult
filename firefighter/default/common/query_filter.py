@@ -21,7 +21,7 @@ _STRING_PARAMETERS = (
     'configuration',
     'device_id',
     'hostname',
-    'master',
+    'main',
     'os',
     'os_version',
     'role',

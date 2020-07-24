@@ -72,7 +72,7 @@ class CsvOutputFormatterTest(unittest.TestCase):
             improvement_direction=improvement_direction.DOWN)])])
     expected = '\r\n'.join([
         'name,unit,avg,count,max,min,std,sum,architectures,benchmarks,' +
-        'benchmarkStart,bots,builds,deviceIds,displayLabel,masters,' +
+        'benchmarkStart,bots,builds,deviceIds,displayLabel,mains,' +
         'memoryAmounts,osNames,osVersions,productVersions,stories,' +
         'storysetRepeats,traceStart,traceUrls',
         'foo,ms,3000,1,3000,3000,0,3000,,benchmark,2017-07-14 02:40:00,,,,' +

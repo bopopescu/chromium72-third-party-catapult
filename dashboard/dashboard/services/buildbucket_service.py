@@ -12,7 +12,7 @@ from dashboard.services import request
 API_BASE_URL = 'https://cr-buildbucket.appspot.com/api/buildbucket/v1/'
 
 # Default Buildbucket bucket name.
-_BUCKET_NAME = 'master.tryserver.chromium.perf'
+_BUCKET_NAME = 'main.tryserver.chromium.perf'
 
 
 def Put(bucket, parameters):

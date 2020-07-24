@@ -21,14 +21,14 @@ def ConvertLegacyDicts(dicts):
     return histogram_set.HistogramSet()
 
   first_dict = dicts[0]
-  master = first_dict['master']
+  main = first_dict['main']
   bot = first_dict['bot']
   suite = first_dict['test'].split('/')[0]
 
   hs = histogram_set.HistogramSet()
 
   for d in dicts:
-    assert d['master'] == master
+    assert d['main'] == main
     assert d['bot'] == bot
 
     test_parts = d['test'].split('/')
@@ -48,7 +48,7 @@ def ConvertLegacyDicts(dicts):
     hs.AddHistogram(h)
 
   hs.AddSharedDiagnosticToAllHistograms(
-      reserved_infos.MASTERS.name, generic_set.GenericSet([master]))
+      reserved_infos.MASTERS.name, generic_set.GenericSet([main]))
   hs.AddSharedDiagnosticToAllHistograms(
       reserved_infos.BOTS.name, generic_set.GenericSet([bot]))
   hs.AddSharedDiagnosticToAllHistograms(

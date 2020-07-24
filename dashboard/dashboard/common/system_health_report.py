@@ -95,8 +95,8 @@ def CreateSystemHealthReport(template_id, name, builder, is_internal, modified):
   # The browser (Chrome/WebView) is always the second part of the report name,
   # and is used to build the right template.
   browser = name.split(':')[1].lower()
-  master = 'ClankInternal' if is_internal else 'ChromiumPerf'
-  bot = ':'.join([master, builder])
+  main = 'ClankInternal' if is_internal else 'ChromiumPerf'
+  bot = ':'.join([main, builder])
 
   @report_template.Static(
       template_id=template_id,

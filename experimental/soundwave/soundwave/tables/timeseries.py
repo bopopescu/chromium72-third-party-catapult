@@ -14,7 +14,7 @@ COLUMN_TYPES = (
     # Index columns.
     ('test_suite', str),  # benchmark name ('loading.mobile')
     ('measurement', str),  # metric name ('timeToFirstContentfulPaint')
-    ('bot', str),  # master/builder name ('ChromiumPerf.android-nexus5')
+    ('bot', str),  # main/builder name ('ChromiumPerf.android-nexus5')
     ('test_case', str),  # story name ('Wikipedia')
     ('point_id', 'int64'),  # monotonically increasing value for time series axis
     # Other columns.
@@ -38,7 +38,7 @@ _CODE_TO_IMPROVEMENT_DIRECTION = {
 
 
 TEST_PATH_PARTS = (
-    'master', 'builder', 'test_suite', 'measurement', 'test_case')
+    'main', 'builder', 'test_suite', 'measurement', 'test_case')
 
 # Query template to find all data points of a given test_path (i.e. fixed
 # test_suite, measurement, bot, and test_case values).
@@ -99,7 +99,7 @@ def _ParseConfigFromTestPath(test_path):
   if len(values) != len(TEST_PATH_PARTS):
     raise ValueError(test_path)
   config = dict(zip(TEST_PATH_PARTS, values))
-  config['bot'] = '%s/%s' % (config.pop('master'), config.pop('builder'))
+  config['bot'] = '%s/%s' % (config.pop('main'), config.pop('builder'))
   return config
 
 

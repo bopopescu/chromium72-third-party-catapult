@@ -21,20 +21,20 @@ class ShortUriTest(testing_common.TestCase):
 
   def testUpgradeOld(self):
     t = graph_data.TestMetadata(
-        has_rows=True, id='master/bot/suite/measurement/case')
+        has_rows=True, id='main/bot/suite/measurement/case')
     t.UpdateSheriff()
     t.put()
     page_state.PageState(id='test_sid', value=json.dumps({
         'charts': [
             [
-                ['master/bot/suite/measurement', ['all']],
+                ['main/bot/suite/measurement', ['all']],
             ],
         ]})).put()
     response = self.testapp.get('/short_uri', {'sid': 'test_sid', 'v2': 'true'})
     expected = {
         'testSuites': ['suite'],
         'measurements': ['measurement'],
-        'bots': ['master:bot'],
+        'bots': ['main:bot'],
         'testCases': ['case'],
     }
     actual = json.loads(response.body)['chartSections'][0]['parameters']
@@ -44,14 +44,14 @@ class ShortUriTest(testing_common.TestCase):
 
   def testUpgradeNew(self):
     t = graph_data.TestMetadata(
-        has_rows=True, id='master/bot/suite/measurement/case')
+        has_rows=True, id='main/bot/suite/measurement/case')
     t.UpdateSheriff()
     t.put()
     page_state.PageState(id='test_sid', value=json.dumps({
         'charts': [
             {
                 'seriesGroups': [
-                    ['master/bot/suite/measurement', ['measurement']],
+                    ['main/bot/suite/measurement', ['measurement']],
                 ],
             },
         ],
@@ -60,7 +60,7 @@ class ShortUriTest(testing_common.TestCase):
     expected = {
         'testSuites': ['suite'],
         'measurements': ['measurement'],
-        'bots': ['master:bot'],
+        'bots': ['main:bot'],
         'testCases': [],
     }
     actual = json.loads(response.body)['chartSections'][0]['parameters']

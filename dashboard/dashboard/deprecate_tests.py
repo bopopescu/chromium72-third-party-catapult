@@ -53,7 +53,7 @@ class DeprecateTestsHandler(request_handler.RequestHandler):
       return
 
     _AddDeprecateTestDataTask({'type': 'fetch-and-process-tests'})
-    _AddDeleteMastersAndBotsTasks()
+    _AddDeleteMainsAndBotsTasks()
 
   def post(self):
     datastore_hooks.SetPrivilegedRequest()
@@ -75,29 +75,29 @@ class DeprecateTestsHandler(request_handler.RequestHandler):
         'Unknown task_type posted to /deprecate_tests: %s', task_type)
 
 
-def _AddDeleteMastersAndBotsTasks():
+def _AddDeleteMainsAndBotsTasks():
   deferred.defer(
       _CheckAndDeleteBotsTask, _queue=_DEPRECATE_TESTS_TASK_QUEUE_NAME)
 
 
 @ndb.synctasklet
-def _CheckAndDeleteMastersTask():
-  q1 = graph_data.Master.query()
-  masters = yield q1.fetch_async(keys_only=True)
+def _CheckAndDeleteMainsTask():
+  q1 = graph_data.Main.query()
+  mains = yield q1.fetch_async(keys_only=True)
 
   @ndb.tasklet
-  def _GetFirstBot(master_key):
-    q = graph_data.Bot.query(ancestor=master_key)
+  def _GetFirstBot(main_key):
+    q = graph_data.Bot.query(ancestor=main_key)
     result = yield q.get_async(keys_only=True)
     raise ndb.Return(result)
 
-  masters_tests = yield [_GetFirstBot(m) for m in masters]
-  masters_to_delete = [
-      masters[i] for i in xrange(len(masters)) if not masters_tests[i]]
+  mains_tests = yield [_GetFirstBot(m) for m in mains]
+  mains_to_delete = [
+      mains[i] for i in xrange(len(mains)) if not mains_tests[i]]
 
-  for m in masters_to_delete:
-    logging.info('Deleting master: %s', str(m))
-  yield [m.delete_async() for m in masters_to_delete]
+  for m in mains_to_delete:
+    logging.info('Deleting main: %s', str(m))
+  yield [m.delete_async() for m in mains_to_delete]
 
 
 @ndb.synctasklet
@@ -108,7 +108,7 @@ def _CheckAndDeleteBotsTask():
   @ndb.tasklet
   def _GetFirstTest(bot_key):
     q = graph_data.TestMetadata.query()
-    q = q.filter(graph_data.TestMetadata.master_name == bot_key.parent().id())
+    q = q.filter(graph_data.TestMetadata.main_name == bot_key.parent().id())
     q = q.filter(graph_data.TestMetadata.bot_name == bot_key.id())
     result = yield q.get_async(keys_only=True)
     raise ndb.Return(result)
@@ -121,9 +121,9 @@ def _CheckAndDeleteBotsTask():
     logging.info('Deleting bot: %s', str(b))
   yield [b.delete_async() for b in bots_to_delete]
 
-  # Now go check masters and delete any with no associated bots
+  # Now go check mains and delete any with no associated bots
   deferred.defer(
-      _CheckAndDeleteMastersTask, _queue=_DEPRECATE_TESTS_TASK_QUEUE_NAME)
+      _CheckAndDeleteMainsTask, _queue=_DEPRECATE_TESTS_TASK_QUEUE_NAME)
 
 
 @ndb.synctasklet
@@ -245,7 +245,7 @@ def _DeleteCachedTestData(test):
   # on whether tests are deprecated, so when a new suite is deprecated,
   # the cache needs to be cleared.
   return layered_cache.DeleteAsync(graph_data.LIST_TESTS_SUBTEST_CACHE_KEY % (
-      test.master_name, test.bot_name, test.suite_name))
+      test.main_name, test.bot_name, test.suite_name))
 
 
 @ndb.tasklet

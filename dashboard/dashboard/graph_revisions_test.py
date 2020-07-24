@@ -27,9 +27,9 @@ class GraphRevisionsTest(testing_common.TestCase):
 
   def _AddMockData(self):
     """Adds mock data to the datastore, not updating stored_object."""
-    master_key = graph_data.Master(id='ChromiumPerf').put()
+    main_key = graph_data.Main(id='ChromiumPerf').put()
     for bot_name in ['win7', 'mac']:
-      graph_data.Bot(id=bot_name, parent=master_key).put()
+      graph_data.Bot(id=bot_name, parent=main_key).put()
       t = graph_data.TestMetadata(id='ChromiumPerf/%s/dromaeo' % bot_name)
       t.UpdateSheriff()
       t.put()

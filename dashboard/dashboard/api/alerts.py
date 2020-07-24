@@ -61,7 +61,7 @@ class AlertsHandler(api_request_handler.ApiRequestHandler):
               is_improvement=is_improvement,
               key=self.request.get('key', None),
               limit=int(self.request.get('limit', 100)),
-              master_name=self.request.get('master', None),
+              main_name=self.request.get('main', None),
               max_end_revision=self.request.get('max_end_revision', None),
               max_start_revision=self.request.get('max_start_revision', None),
               max_timestamp=max_timestamp,

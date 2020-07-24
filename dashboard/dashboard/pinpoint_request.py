@@ -93,7 +93,7 @@ def ResolveToGitHash(commit_position):
     int(commit_position)
     result = crrev_service.GetNumbering(
         number=commit_position,
-        numbering_identifier='refs/heads/master',
+        numbering_identifier='refs/heads/main',
         numbering_type='COMMIT_POSITION',
         project='chromium',
         repo='chromium/src')

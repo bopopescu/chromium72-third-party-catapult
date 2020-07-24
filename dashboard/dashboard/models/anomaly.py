@@ -46,8 +46,8 @@ class Anomaly(internal_only_model.InternalOnlyModel):
   test = ndb.KeyProperty(indexed=True)
   statistic = ndb.StringProperty(indexed=True)
 
-  # We'd like to be able to query Alerts by Master, Bot, and Benchmark names.
-  master_name = ndb.ComputedProperty(
+  # We'd like to be able to query Alerts by Main, Bot, and Benchmark names.
+  main_name = ndb.ComputedProperty(
       lambda self: utils.TestPath(self.test).split('/')[0],
       indexed=True)
   bot_name = ndb.ComputedProperty(
@@ -181,7 +181,7 @@ class Anomaly(internal_only_model.InternalOnlyModel):
       key=None,
       keys_only=False,
       limit=100,
-      master_name=None,
+      main_name=None,
       max_end_revision=None,
       max_start_revision=None,
       max_timestamp=None,
@@ -231,8 +231,8 @@ class Anomaly(internal_only_model.InternalOnlyModel):
         query = query.filter(cls.test.IN(test_keys))
         query = query.order(cls.key)
         inequality_property = 'key'
-      if master_name:
-        query = query.filter(cls.master_name == master_name)
+      if main_name:
+        query = query.filter(cls.main_name == main_name)
       if bot_name:
         query = query.filter(cls.bot_name == bot_name)
       if test_suite_name:

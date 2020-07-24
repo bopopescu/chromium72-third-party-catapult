@@ -45,20 +45,20 @@ class SpeedReleasingTest(testing_common.TestCase):
     self.UnsetCurrentUser()
 
   def _AddInternalBotsToDataStore(self):
-    """Adds sample bot/master pairs."""
-    master_key = ndb.Key('Master', 'ChromiumPerf')
+    """Adds sample bot/main pairs."""
+    main_key = ndb.Key('Main', 'ChromiumPerf')
     graph_data.Bot(
-        id='win', parent=master_key, internal_only=True).put()
+        id='win', parent=main_key, internal_only=True).put()
     graph_data.Bot(
-        id='linux', parent=master_key, internal_only=True).put()
+        id='linux', parent=main_key, internal_only=True).put()
 
   def _AddPublicBotsToDataStore(self):
-    """Adds sample bot/master pairs."""
-    master_key = ndb.Key('Master', 'ChromiumPerf')
+    """Adds sample bot/main pairs."""
+    main_key = ndb.Key('Main', 'ChromiumPerf')
     graph_data.Bot(
-        id='win', parent=master_key, internal_only=False).put()
+        id='win', parent=main_key, internal_only=False).put()
     graph_data.Bot(
-        id='linux', parent=master_key, internal_only=False).put()
+        id='linux', parent=main_key, internal_only=False).put()
 
   def _AddTableConfigDataStore(self, name, is_internal, is_downstream=False):
     """Add sample internal only tableConfig."""
@@ -82,18 +82,18 @@ class SpeedReleasingTest(testing_common.TestCase):
     sheriff_key.put()
 
   def _AddTests(self, is_downstream):
-    master = 'ClankInternal' if is_downstream else 'ChromiumPerf'
-    testing_common.AddTests([master], ['win', 'linux'], {
+    main = 'ClankInternal' if is_downstream else 'ChromiumPerf'
+    testing_common.AddTests([main], ['win', 'linux'], {
         'my_test_suite': {
             'my_test': {},
             'my_other_test': {},
         },
     })
     keys = [
-        utils.TestKey(master + '/win/my_test_suite/my_test'),
-        utils.TestKey(master + '/win/my_test_suite/my_other_test'),
-        utils.TestKey(master + '/linux/my_test_suite/my_test'),
-        utils.TestKey(master + '/linux/my_test_suite/my_other_test'),
+        utils.TestKey(main + '/win/my_test_suite/my_test'),
+        utils.TestKey(main + '/win/my_test_suite/my_other_test'),
+        utils.TestKey(main + '/linux/my_test_suite/my_test'),
+        utils.TestKey(main + '/linux/my_test_suite/my_other_test'),
     ]
     for test_key in keys:
       test = test_key.get()
@@ -101,20 +101,20 @@ class SpeedReleasingTest(testing_common.TestCase):
       test.put()
     return keys
 
-  def _AddAlertsWithDifferentMasterAndBenchmark(self):
-    """Adds 10 alerts with different benchmark/master."""
+  def _AddAlertsWithDifferentMainAndBenchmark(self):
+    """Adds 10 alerts with different benchmark/main."""
     sheriff_key = sheriff.Sheriff(
         id='Fake Sheriff', email='internal@chromium.org')
     sheriff_key.patterns = ['*/*/my_fake_suite/*']
     sheriff_key.put()
-    master = 'FakeMaster'
-    testing_common.AddTests([master], ['win'], {
+    main = 'FakeMain'
+    testing_common.AddTests([main], ['win'], {
         'my_fake_suite': {
             'my_fake_test': {},
         },
     })
     keys = [
-        utils.TestKey(master + '/win/my_fake_suite/my_fake_test'),
+        utils.TestKey(main + '/win/my_fake_suite/my_fake_test'),
     ]
     self._AddRows(keys)
     self._AddAlertsToDataStore(keys)
@@ -200,15 +200,15 @@ class SpeedReleasingTest(testing_common.TestCase):
                   '"ChromiumPerf/win": {"my_test_suite/my_test": 2.0, '
                   '"my_test_suite/my_other_test": 2.0}}}', response)
     self.assertIn('"urls": {"ChromiumPerf/linux/my_test_suite/my_other_test": '
-                  '"?masters=ChromiumPerf&start_rev=1&checked=my_other_test&'
+                  '"?mains=ChromiumPerf&start_rev=1&checked=my_other_test&'
                   'tests=my_test_suite%2Fmy_other_test&end_rev=2&bots=linux", '
                   '"ChromiumPerf/win/my_test_suite/my_other_test": '
-                  '"?masters=ChromiumPerf&start_rev=1&checked=my_other_test&'
+                  '"?mains=ChromiumPerf&start_rev=1&checked=my_other_test&'
                   'tests=my_test_suite%2Fmy_other_test&end_rev=2&bots=win", '
-                  '"ChromiumPerf/linux/my_test_suite/my_test": "?masters'
+                  '"ChromiumPerf/linux/my_test_suite/my_test": "?mains'
                   '=ChromiumPerf&start_rev=1&checked=my_test&tests='
                   'my_test_suite%2Fmy_test&end_rev=2&bots=linux", '
-                  '"ChromiumPerf/win/my_test_suite/my_test": "?masters='
+                  '"ChromiumPerf/win/my_test_suite/my_test": "?mains='
                   'ChromiumPerf&start_rev=1&checked=my_test&tests=my_test_suite'
                   '%2Fmy_test&end_rev=2&bots=win"}',
                   response)
@@ -364,7 +364,7 @@ class SpeedReleasingTest(testing_common.TestCase):
     self._AddSheriffToDatastore()
     self._AddRows(keys)
     self._AddAlertsToDataStore(keys)
-    self._AddAlertsWithDifferentMasterAndBenchmark()
+    self._AddAlertsWithDifferentMainAndBenchmark()
     response = self.testapp.post('/speed_releasing/BestTable?'
                                  'revB=420000&revA=421000&anomalies=true')
     self.assertIn('"revisions": [421000, 420000]', response)
@@ -372,14 +372,14 @@ class SpeedReleasingTest(testing_common.TestCase):
     self.assertNotIn('"display_revisions"', response)
 
     # There are 50 anomalies total (5 tests on 10 revisions). 1 test does not
-    # have the correct master/benchmark, so 4 valid tests. Further, the
+    # have the correct main/benchmark, so 4 valid tests. Further, the
     # revisions are [420500:421500:100] meaning that there are 6 revisions in
     # the url param's range. 6*4 = 24 anomalies that should be returned.
     anomaly_list = self.GetJsonValue(response, 'anomalies')
     self.assertEqual(len(anomaly.Anomaly.query().fetch()), 50)
     self.assertEqual(len(anomaly_list), 24)
     for alert in anomaly_list:
-      self.assertEqual(alert['master'], 'ChromiumPerf')
+      self.assertEqual(alert['main'], 'ChromiumPerf')
       self.assertIn(alert['test'], ['my_test', 'my_other_test'])
       self.assertGreaterEqual(alert['end_revision'], 420000)
       self.assertLessEqual(alert['end_revision'], 421000)

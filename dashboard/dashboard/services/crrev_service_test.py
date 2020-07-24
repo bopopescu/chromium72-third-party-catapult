@@ -16,7 +16,7 @@ class CrrevServiceTest(unittest.TestCase):
   def testGetNumbering(self, mock_request):
     params = {
         'number': '498032',
-        'numbering_identifier': 'refs/heads/master',
+        'numbering_identifier': 'refs/heads/main',
         'numbering_type': 'COMMIT_POSITION',
         'project': 'chromium',
         'repo': 'chromium/src'
@@ -27,7 +27,7 @@ class CrrevServiceTest(unittest.TestCase):
         'numbering_type': 'COMMIT_POSITION',
         'number': '498032',
         'project': 'chromium',
-        'numbering_identifier': 'refs/heads/master',
+        'numbering_identifier': 'refs/heads/main',
         'redirect_url': 'https://chromium.googlesource.com/chromium/src/+/foo',
         'kind': 'crrev#numberingItem',
         'etag': '"z28iYHtWcY14RRFEUgin0OFGLHY/au8p5YtferYwojQRpsPavK6G5-A"'
@@ -40,4 +40,4 @@ class CrrevServiceTest(unittest.TestCase):
         'https://cr-rev.appspot.com/_ah/api/crrev/v1/get_numbering', 'GET',
         project='chromium', repo='chromium/src', number='498032',
         numbering_type='COMMIT_POSITION',
-        numbering_identifier='refs/heads/master')
+        numbering_identifier='refs/heads/main')

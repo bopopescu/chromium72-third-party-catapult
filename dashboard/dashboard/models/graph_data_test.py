@@ -11,8 +11,8 @@ from dashboard.models import graph_data
 class GraphDataTest(testing_common.TestCase):
 
   def testPutTestTruncatesDescription(self):
-    master = graph_data.Master(id='M').put()
-    graph_data.Bot(parent=master, id='b').put()
+    main = graph_data.Main(id='M').put()
+    graph_data.Bot(parent=main, id='b').put()
     long_string = 500 * 'x'
     too_long = long_string + 'y'
     t = graph_data.TestMetadata(id='M/b/a', description=too_long)

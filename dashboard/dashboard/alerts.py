@@ -148,7 +148,7 @@ def _AlertDict(alert_entity):
       'end_revision': alert_entity.end_revision,
       'date': str(alert_entity.timestamp.date()),
       'timestamp': alert_entity.timestamp.isoformat(),
-      'master': test_path_parts[0],
+      'main': test_path_parts[0],
       'bot': test_path_parts[1],
       'testsuite': test_path_parts[2],
       'test': '/'.join(test_path_parts[3:]),

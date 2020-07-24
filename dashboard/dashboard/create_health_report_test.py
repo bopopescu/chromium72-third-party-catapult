@@ -54,7 +54,7 @@ class CreateHealthReportTest(testing_common.TestCase):
     self.UnsetCurrentUser()
 
   def _AddInternalBotsToDataStore(self):
-    """Adds sample bot/master pairs."""
+    """Adds sample bot/main pairs."""
     self._AddTests()
     bots = graph_data.Bot.query().fetch()
     for bot in bots:
@@ -62,14 +62,14 @@ class CreateHealthReportTest(testing_common.TestCase):
       bot.put()
 
   def _AddMixedBotsToDataStore(self):
-    """Adds sample bot/master pairs."""
+    """Adds sample bot/main pairs."""
     self._AddTests()
     bots = graph_data.Bot.query().fetch()
     bots[1].internal_only = True
     bots[1].put()
 
   def _AddPublicBotsToDataStore(self):
-    """Adds sample bot/master pairs."""
+    """Adds sample bot/main pairs."""
     self._AddTests()
 
   def _AddTests(self):
@@ -115,11 +115,11 @@ class CreateHealthReportTest(testing_common.TestCase):
     self.assertEqual(
         ['my_test_suite/my_test', 'my_test_suite/my_other_test'],
         table_entity.tests)
-    master_key = ndb.Key('Master', 'ChromiumPerf')
+    main_key = ndb.Key('Main', 'ChromiumPerf')
     win_bot = graph_data.Bot(
-        id='win', parent=master_key, internal_only=False).key
+        id='win', parent=main_key, internal_only=False).key
     linux_bot = graph_data.Bot(
-        id='linux', parent=master_key, internal_only=False).key
+        id='linux', parent=main_key, internal_only=False).key
     bots = [win_bot, linux_bot]
     self.assertEqual(bots, table_entity.bots)
     self.assertEqual(
@@ -156,7 +156,7 @@ class CreateHealthReportTest(testing_common.TestCase):
         'xsrf_token': xsrf.GenerateToken(users.get_current_user()),
         'override': 0,
         })
-    self.assertIn('Invalid Master/Bot: garbage/moarGarbage', response)
+    self.assertIn('Invalid Main/Bot: garbage/moarGarbage', response)
     query = table_config.TableConfig.query()
     table_values = query.fetch()
     self.assertEqual(len(table_values), 0)
@@ -247,11 +247,11 @@ class CreateHealthReportTest(testing_common.TestCase):
     self.assertEqual(
         ['my_test_suite/my_test', 'my_test_suite/my_other_test'],
         table_entity.tests)
-    master_key = ndb.Key('Master', 'ChromiumPerf')
+    main_key = ndb.Key('Main', 'ChromiumPerf')
     win_bot = graph_data.Bot(
-        id='win', parent=master_key, internal_only=False).key
+        id='win', parent=main_key, internal_only=False).key
     linux_bot = graph_data.Bot(
-        id='linux', parent=master_key, internal_only=False).key
+        id='linux', parent=main_key, internal_only=False).key
     bots = [win_bot, linux_bot]
     self.assertEqual(bots, table_entity.bots)
     self.assertEqual(

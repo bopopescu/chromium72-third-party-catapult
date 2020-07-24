@@ -39,10 +39,10 @@ index %(hash_a)s..%(hash_b)s 100644
 """
 
 _BOT_BROWSER_MAP_KEY = 'bot_browser_map'
-_INTERNAL_MASTERS_KEY = 'internal_masters'
+_INTERNAL_MASTERS_KEY = 'internal_mains'
 _BUILDER_TYPES_KEY = 'bisect_builder_types'
-_MASTER_TRY_SERVER_MAP_KEY = 'master_try_server_map'
-_MASTER_BUILDBUCKET_MAP_KEY = 'master_buildbucket_map'
+_MASTER_TRY_SERVER_MAP_KEY = 'main_try_server_map'
+_MASTER_BUILDBUCKET_MAP_KEY = 'main_buildbucket_map'
 _NON_TELEMETRY_TEST_COMMANDS = {
     'angle_perftests': [
         './out/Release/angle_perftests',
@@ -134,14 +134,14 @@ class StartBisectHandler(request_handler.RequestHandler):
   def _PerformBisectStep(self, user):
     """Gathers the parameters for a bisect job and triggers the job."""
     bug_id = int(self.request.get('bug_id', -1))
-    master_name = self.request.get('master', 'ChromiumPerf')
+    main_name = self.request.get('main', 'ChromiumPerf')
     internal_only = self.request.get('internal_only') == 'true'
     bisect_bot = self.request.get('bisect_bot')
     use_staging_bot = self.request.get('use_staging_bot') == 'true'
 
     bisect_config = GetBisectConfig(
         bisect_bot=bisect_bot,
-        master_name=master_name,
+        main_name=main_name,
         suite=self.request.get('suite'),
         metric=self.request.get('metric'),
         good_revision=self.request.get('good_revision'),
@@ -164,7 +164,7 @@ class StartBisectHandler(request_handler.RequestHandler):
         config=config_python_string,
         bug_id=bug_id,
         email=user,
-        master_name=master_name,
+        main_name=main_name,
         internal_only=internal_only,
         job_type='bisect')
 
@@ -205,11 +205,11 @@ def _PrefillInfo(test_path):
   graph_key = utils.TestKey(graph_path)
 
   info = {'suite': suite.test_name}
-  info['master'] = suite.master_name
+  info['main'] = suite.main_name
   info['internal_only'] = suite.internal_only
 
-  info['all_bots'] = _GetAvailableBisectBots(suite.master_name)
-  info['bisect_bot'] = GuessBisectBot(suite.master_name, suite.bot_name)
+  info['all_bots'] = _GetAvailableBisectBots(suite.main_name)
+  info['bisect_bot'] = GuessBisectBot(suite.main_name, suite.bot_name)
 
   user = utils.GetEmail()
   if not user:
@@ -240,7 +240,7 @@ def _PrefillInfo(test_path):
 
 
 def GetBisectConfig(
-    bisect_bot, master_name, suite, metric, good_revision, bad_revision,
+    bisect_bot, main_name, suite, metric, good_revision, bad_revision,
     repeat_count, max_time_minutes, bug_id, story_filter=None,
     bisect_mode='mean', use_staging_bot=False):
   """Fills in a JSON response with the filled-in config file.
@@ -248,7 +248,7 @@ def GetBisectConfig(
   Args:
     bisect_bot: Bisect bot name. (This should be either a legacy bisector or a
         recipe-enabled tester).
-    master_name: Master name of the test being bisected.
+    main_name: Main name of the test being bisected.
     suite: Test suite name of the test being bisected.
     metric: Bisect bot "metric" parameter, in the form "chart/trace".
     good_revision: Known good revision number.
@@ -288,7 +288,7 @@ def GetBisectConfig(
       'repeat_count': str(repeat_count),
       'max_time_minutes': str(max_time_minutes),
       'bug_id': str(bug_id),
-      'builder_type': _BuilderType(master_name),
+      'builder_type': _BuilderType(main_name),
       'target_arch': GuessTargetArch(bisect_bot),
       'bisect_mode': bisect_mode,
   }
@@ -297,25 +297,25 @@ def GetBisectConfig(
   # Do this here since we need to guess parts of the command line using the
   # bot's name.
   if use_staging_bot:
-    bisect_bot = _GuessStagingBot(master_name, bisect_bot) or bisect_bot
+    bisect_bot = _GuessStagingBot(main_name, bisect_bot) or bisect_bot
 
   config_dict['recipe_tester_name'] = bisect_bot
   return config_dict
 
 
-def _BuilderType(master_name):
+def _BuilderType(main_name):
   """Returns the builder_type string to use in the bisect config.
 
   Args:
-    master_name: The test master name.
+    main_name: The test main name.
 
   Returns:
     A string which indicates where the builds should be obtained from.
   """
   builder_types = namespaced_stored_object.Get(_BUILDER_TYPES_KEY)
-  if not builder_types or master_name not in builder_types:
+  if not builder_types or main_name not in builder_types:
     return 'perf'
-  return builder_types[master_name]
+  return builder_types[main_name]
 
 
 def GuessTargetArch(bisect_bot):
@@ -366,29 +366,29 @@ def _GetPerfTryConfig(
   return config_dict
 
 
-def _GetAvailableBisectBots(master_name):
-  """Gets all available bisect bots corresponding to a master name."""
+def _GetAvailableBisectBots(main_name):
+  """Gets all available bisect bots corresponding to a main name."""
   bisect_bot_map = namespaced_stored_object.Get(can_bisect.BISECT_BOT_MAP_KEY)
-  for master, platform_bot_pairs in bisect_bot_map.iteritems():
-    if master_name.startswith(master):
+  for main, platform_bot_pairs in bisect_bot_map.iteritems():
+    if main_name.startswith(main):
       return sorted({bot for _, bot in platform_bot_pairs})
   return []
 
 
-def GuessBisectBot(master_name, bot_name):
+def GuessBisectBot(main_name, bot_name):
   """Returns a bisect bot name based on |bot_name| (perf_id) string."""
   platform_bot_pairs = []
   bisect_bot_map = namespaced_stored_object.Get(can_bisect.BISECT_BOT_MAP_KEY)
   if bisect_bot_map:
-    for master, pairs in bisect_bot_map.iteritems():
-      if master_name.startswith(master):
+    for main, pairs in bisect_bot_map.iteritems():
+      if main_name.startswith(main):
         platform_bot_pairs = pairs
         break
 
   fallback = 'linux_perf_bisect'
   if not platform_bot_pairs:
     # No bots available.
-    logging.error('No bisect bots defined for %s.', master_name)
+    logging.error('No bisect bots defined for %s.', main_name)
     return fallback
 
   bot_name = bot_name.lower()
@@ -401,7 +401,7 @@ def GuessBisectBot(master_name, bot_name):
       return fallback
 
   # Nothing was found; log a warning and return a fall-back name.
-  logging.warning('No bisect bot for %s/%s.', master_name, bot_name)
+  logging.warning('No bisect bot for %s/%s.', main_name, bot_name)
   return platform_bot_pairs[0][1]
 
 
@@ -738,15 +738,15 @@ def _PerformBuildbucketBisect(bisect_job):
 
 def _GetTryServerBucket(bisect_job):
   """Returns the bucket name to be used by buildbucket."""
-  master_bucket_map = namespaced_stored_object.Get(_MASTER_BUILDBUCKET_MAP_KEY)
-  default = 'master.tryserver.chromium.perf'
-  if not master_bucket_map:
+  main_bucket_map = namespaced_stored_object.Get(_MASTER_BUILDBUCKET_MAP_KEY)
+  default = 'main.tryserver.chromium.perf'
+  if not main_bucket_map:
     logging.warning(
         'Could not get bucket to be used by buildbucket, using default.')
     return default
-  return master_bucket_map.get(bisect_job.master_name, default)
+  return main_bucket_map.get(bisect_job.main_name, default)
 
-def _GuessStagingBot(master_name, production_bot_name):
+def _GuessStagingBot(main_name, production_bot_name):
   staging_bot_map = stored_object.Get('staging_bot_map') or {
       'ChromiumPerf': [
           ['win', 'staging_win_perf_bisect'],
@@ -754,6 +754,6 @@ def _GuessStagingBot(master_name, production_bot_name):
           ['linux', 'staging_linux_perf_bisect'],
           ['android', 'staging_android_nexus5X_perf_bisect']]
   }
-  for infix, staging_bot in staging_bot_map[master_name]:
+  for infix, staging_bot in staging_bot_map[main_name]:
     if infix in production_bot_name:
       return staging_bot

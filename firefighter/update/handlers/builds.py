@@ -24,8 +24,8 @@ class Builds(webapp2.RequestHandler):
 
     current_events = []
     events = []
-    for master_name in constants.MASTER_NAMES:
-      builders = buildbot.Builders(master_name)
+    for main_name in constants.MASTER_NAMES:
+      builders = buildbot.Builders(main_name)
       available_builds = _AvailableBuilds(builders)
       recorded_builds = _RecordedBuilds(bq, builders, available_builds)
       for builder in builders:
@@ -145,8 +145,8 @@ def _TraceEventsFromBuild(builder, build, query_time):
       'builder': builder.name,
       'configuration': configuration,
       'host_shard': host_shard,
-      'hostname': build.slave_name,
-      'master': builder.master_name,
+      'hostname': build.subordinate_name,
+      'main': builder.main_name,
       'os': os,
       'os_version': os_version,
       'role': role,
@@ -176,8 +176,8 @@ def _TraceEventsFromBuild(builder, build, query_time):
         'builder': builder.name,
         'configuration': configuration,
         'host_shard': host_shard,
-        'hostname': build.slave_name,
-        'master': builder.master_name,
+        'hostname': build.subordinate_name,
+        'main': builder.main_name,
         'os': os,
         'os_version': os_version,
         'role': role,

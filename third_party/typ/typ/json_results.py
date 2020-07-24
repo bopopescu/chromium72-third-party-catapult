@@ -99,14 +99,14 @@ def make_full_results(metadata, seconds_since_epoch, all_test_names, results):
     return full_results
 
 
-def make_upload_request(test_results_server, builder, master, testtype,
+def make_upload_request(test_results_server, builder, main, testtype,
                         full_results):
     if test_results_server.startswith('http'):
         url = '%s/testfile/upload' % test_results_server
     else:
         url = 'https://%s/testfile/upload' % test_results_server
     attrs = [('builder', builder),
-             ('master', master),
+             ('main', main),
              ('testtype', testtype)]
     content_type, data = _encode_multipart_form_data(attrs, full_results)
     return url, content_type, data

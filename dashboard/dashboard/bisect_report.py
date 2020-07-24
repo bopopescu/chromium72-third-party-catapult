@@ -32,21 +32,21 @@ _BENCHMARK_DOC_URLS = {
             'memory.top_10_mobile'
         ],
         'url': ('https://chromium.googlesource.com/chromium/src/+/'\
-            'master/docs/memory-infra/memory_benchmarks.md'),
+            'main/docs/memory-infra/memory_benchmarks.md'),
     },
     'blink_perf': {
         'benchmarks': [
             'blink_perf.',
         ],
         'url': ('https://chromium.googlesource.com/chromium/src/+/'\
-            'master/docs/speed/benchmark_harnesses/blink_perf.md'),
+            'main/docs/speed/benchmark_harnesses/blink_perf.md'),
     },
     'webrtc': {
         'benchmarks': [
             'webrtc.',
         ],
         'url': ('https://chromium.googlesource.com/chromium/src/+/'\
-            'master/docs/speed/benchmark_harnesses/webrtc_perf.md'),
+            'main/docs/speed/benchmark_harnesses/webrtc_perf.md'),
     },
 }
 
@@ -220,7 +220,7 @@ def _GenerateReport(results_data):
   if results_data.get('culprit_data'):
     message = STATUS_REPRO_WITH_CULPRIT
 
-  # 2 - Unexpected failure in the recipe, could be a master restart, exception
+  # 2 - Unexpected failure in the recipe, could be a main restart, exception
   # thrown, etc.
   if message == STATUS_UNKNOWN:
     aborted_reason = results_data.get('aborted_reason', '')

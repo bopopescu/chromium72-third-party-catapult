@@ -69,11 +69,11 @@ def _FetchCompletedPinpointJobs(start_date):
 
 
 def _CreateHistogramSet(
-    master, bot, benchmark, commit_position, histograms):
+    main, bot, benchmark, commit_position, histograms):
   histograms = histogram_set.HistogramSet(histograms)
   histograms.AddSharedDiagnosticToAllHistograms(
       reserved_infos.MASTERS.name,
-      generic_set.GenericSet([master]))
+      generic_set.GenericSet([main]))
   histograms.AddSharedDiagnosticToAllHistograms(
       reserved_infos.BOTS.name,
       generic_set.GenericSet([bot]))

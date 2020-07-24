@@ -65,21 +65,21 @@ class InvalidTagException(Exception):
 
 # Galois/Counter Mode with AES-128 and 96-bit IV
 class AES_GCM(object):
-    def __init__(self, master_key):
+    def __init__(self, main_key):
         self.prev_init_value = None
-        self._master_key = ""
+        self._main_key = ""
         self._aes_ecb = None
         self._auth_key = 0
         self._pre_table = None
-        self.change_key(master_key)
+        self.change_key(main_key)
 
-    def change_key(self, master_key):
+    def change_key(self, main_key):
         #RLB: Need to allow 192-, 256-bit keys
-        #if master_key >= (1 << 128):
-        #    raise InvalidInputException('Master key should be 128-bit')
+        #if main_key >= (1 << 128):
+        #    raise InvalidInputException('Main key should be 128-bit')
 
-        self._master_key = long_to_bytes(master_key, 16)
-        self._aes_ecb = AES.new(self._master_key, AES.MODE_ECB)
+        self._main_key = long_to_bytes(main_key, 16)
+        self._aes_ecb = AES.new(self._main_key, AES.MODE_ECB)
         self._auth_key = bytes_to_long(self._aes_ecb.encrypt(b'\x00' * 16))
 
         # precompute the table for multiplication in finite field
@@ -142,7 +142,7 @@ class AES_GCM(object):
                 prefix=long_to_bytes(init_value, 12),
                 initial_value=2,  # notice this
                 allow_wraparound=True)
-            aes_ctr = AES.new(self._master_key, AES.MODE_CTR, counter=counter)
+            aes_ctr = AES.new(self._main_key, AES.MODE_CTR, counter=counter)
 
             if 0 != len_plaintext % 16:
                 padded_plaintext = plaintext + \
@@ -181,7 +181,7 @@ class AES_GCM(object):
                 prefix=long_to_bytes(init_value, 12),
                 initial_value=2,
                 allow_wraparound=True)
-            aes_ctr = AES.new(self._master_key, AES.MODE_CTR, counter=counter)
+            aes_ctr = AES.new(self._main_key, AES.MODE_CTR, counter=counter)
 
             if 0 != len_ciphertext % 16:
                 padded_ciphertext = ciphertext + \
@@ -197,7 +197,7 @@ class AES_GCM(object):
 
 
 if __name__ == '__main__':
-    master_key = 0xfeffe9928665731c6d6a8f9467308308
+    main_key = 0xfeffe9928665731c6d6a8f9467308308
     plaintext = b'\xd9\x31\x32\x25\xf8\x84\x06\xe5' + \
                 b'\xa5\x59\x09\xc5\xaf\xf5\x26\x9a' + \
                 b'\x86\xa7\xa9\x53\x15\x34\xf7\xda' + \
@@ -222,7 +222,7 @@ if __name__ == '__main__':
 
     print('plaintext:', hex(bytes_to_long(plaintext)))
 
-    my_gcm = AES_GCM(master_key)
+    my_gcm = AES_GCM(main_key)
     encrypted, new_tag = my_gcm.encrypt(init_value, plaintext, auth_data)
     print('encrypted:', hex(bytes_to_long(encrypted)))
     print('auth tag: ', hex(new_tag))

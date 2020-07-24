@@ -181,7 +181,7 @@ class DeprecateTestsTest(testing_common.TestCase):
 
   @mock.patch.object(
       deprecate_tests, '_AddDeprecateTestDataTask', mock.MagicMock())
-  def testPost_DeletesBot_NotMaster(self):
+  def testPost_DeletesBot_NotMain(self):
     testing_common.AddTests(*_TESTS_MULTIPLE_MASTERS_AND_BOTS)
     utils.TestKey('ChromiumPerf/mac/SunSpider/Total/t').delete()
     utils.TestKey('ChromiumPerf/mac/SunSpider/Total').delete()
@@ -189,29 +189,29 @@ class DeprecateTestsTest(testing_common.TestCase):
 
     for m in _TESTS_MULTIPLE_MASTERS_AND_BOTS[0]:
       for b in _TESTS_MULTIPLE_MASTERS_AND_BOTS[1]:
-        master_key = ndb.Key('Master', m)
-        bot_key = ndb.Key('Bot', b, parent=master_key)
+        main_key = ndb.Key('Main', m)
+        bot_key = ndb.Key('Bot', b, parent=main_key)
         self.assertIsNotNone(bot_key.get())
-        self.assertIsNotNone(master_key.get())
+        self.assertIsNotNone(main_key.get())
 
     self.testapp.get('/deprecate_tests')
 
     self.ExecuteDeferredTasks(deprecate_tests._DEPRECATE_TESTS_TASK_QUEUE_NAME)
 
-    expected_deleted_bots = [ndb.Key('Master', 'ChromiumPerf', 'Bot', 'mac')]
+    expected_deleted_bots = [ndb.Key('Main', 'ChromiumPerf', 'Bot', 'mac')]
     for m in _TESTS_MULTIPLE_MASTERS_AND_BOTS[0]:
       for b in _TESTS_MULTIPLE_MASTERS_AND_BOTS[1]:
-        master_key = ndb.Key('Master', m)
-        bot_key = ndb.Key('Bot', b, parent=master_key)
+        main_key = ndb.Key('Main', m)
+        bot_key = ndb.Key('Bot', b, parent=main_key)
         if bot_key in expected_deleted_bots:
           self.assertIsNone(bot_key.get())
         else:
           self.assertIsNotNone(bot_key.get())
-        self.assertIsNotNone(master_key.get())
+        self.assertIsNotNone(main_key.get())
 
   @mock.patch.object(
       deprecate_tests, '_AddDeprecateTestDataTask', mock.MagicMock())
-  def testPost_DeletesMasterAndBot(self):
+  def testPost_DeletesMainAndBot(self):
     testing_common.AddTests(*_TESTS_MULTIPLE_MASTERS_AND_BOTS)
     utils.TestKey('ChromiumPerf/mac/SunSpider/Total/t').delete()
     utils.TestKey('ChromiumPerf/mac/SunSpider/Total').delete()
@@ -222,28 +222,28 @@ class DeprecateTestsTest(testing_common.TestCase):
 
     for m in _TESTS_MULTIPLE_MASTERS_AND_BOTS[0]:
       for b in _TESTS_MULTIPLE_MASTERS_AND_BOTS[1]:
-        master_key = ndb.Key('Master', m)
-        bot_key = ndb.Key('Bot', b, parent=master_key)
+        main_key = ndb.Key('Main', m)
+        bot_key = ndb.Key('Bot', b, parent=main_key)
         self.assertIsNotNone(bot_key.get())
-        self.assertIsNotNone(master_key.get())
+        self.assertIsNotNone(main_key.get())
 
     self.testapp.get('/deprecate_tests')
 
     self.ExecuteDeferredTasks(deprecate_tests._DEPRECATE_TESTS_TASK_QUEUE_NAME)
 
     expected_deleted_bots = [
-        ndb.Key('Master', 'ChromiumPerf', 'Bot', 'mac'),
-        ndb.Key('Master', 'ChromiumPerf', 'Bot', 'linux')]
-    expected_deleted_masters = [ndb.Key('Master', 'ChromiumPerf')]
+        ndb.Key('Main', 'ChromiumPerf', 'Bot', 'mac'),
+        ndb.Key('Main', 'ChromiumPerf', 'Bot', 'linux')]
+    expected_deleted_mains = [ndb.Key('Main', 'ChromiumPerf')]
     for m in _TESTS_MULTIPLE_MASTERS_AND_BOTS[0]:
-      master_key = ndb.Key('Master', m)
-      if master_key in expected_deleted_masters:
-        self.assertIsNone(master_key.get())
+      main_key = ndb.Key('Main', m)
+      if main_key in expected_deleted_mains:
+        self.assertIsNone(main_key.get())
       else:
-        self.assertIsNotNone(master_key.get())
+        self.assertIsNotNone(main_key.get())
 
       for b in _TESTS_MULTIPLE_MASTERS_AND_BOTS[1]:
-        bot_key = ndb.Key('Bot', b, parent=master_key)
+        bot_key = ndb.Key('Bot', b, parent=main_key)
         if bot_key in expected_deleted_bots:
           self.assertIsNone(bot_key.get())
         else:

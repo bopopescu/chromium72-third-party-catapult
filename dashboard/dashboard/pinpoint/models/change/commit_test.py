@@ -73,7 +73,7 @@ deps_os = {
         'committer': {'time': 'Fri Jan 01 00:01:00 2016'},
         'message': 'Subject.\n\n'
                    'Commit message.\n'
-                   'Cr-Commit-Position: refs/heads/master@{#437745}',
+                   'Cr-Commit-Position: refs/heads/main@{#437745}',
     }
 
     expected = {

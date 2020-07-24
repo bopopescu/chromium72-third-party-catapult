@@ -132,7 +132,7 @@ def _CreateTestSuiteDict():
           ...
       }
 
-    Where 'mas', 'dep', and 'des' are abbreviations for 'masters',
+    Where 'mas', 'dep', and 'des' are abbreviations for 'mains',
     'deprecated', and 'description', respectively.
   """
   suites = _FetchSuites()
@@ -146,7 +146,7 @@ def _CreateTestSuiteDict():
   suites = None
 
   # Should have a dict of {suite: [all suites]}
-  # Now generate masters
+  # Now generate mains
   for k, v in result.iteritems():
     current_suites = v['suites']
     v['mas'] = {}
@@ -159,12 +159,12 @@ def _CreateTestSuiteDict():
       v['dep'] = True
 
     for s in current_suites:
-      master_name = s.master_name
+      main_name = s.main_name
       bot_name = s.bot_name
-      if not master_name in v['mas']:
-        v['mas'][master_name] = {}
-      if not bot_name in v['mas'][master_name]:
-        v['mas'][master_name][bot_name] = s.deprecated
+      if not main_name in v['mas']:
+        v['mas'][main_name] = {}
+      if not bot_name in v['mas'][main_name]:
+        v['mas'][main_name][bot_name] = s.deprecated
 
     # We don't need these suites anymore so free them.
     del result[k]['suites']
@@ -194,13 +194,13 @@ def _FetchSuites():
 def _GetTestSubPath(key):
   """Gets the part of the test path after the suite, for the given test key.
 
-  For example, for a test with the test path 'MyMaster/bot/my_suite/foo/bar',
+  For example, for a test with the test path 'MyMain/bot/my_suite/foo/bar',
   this should return 'foo/bar'.
 
   Args:
     key: The key of the TestMetadata entity.
 
   Returns:
-    Slash-separated test path part after master/bot/suite.
+    Slash-separated test path part after main/bot/suite.
   """
   return '/'.join(p for p in key.string_id().split('/')[3:])

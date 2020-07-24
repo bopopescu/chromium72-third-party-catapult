@@ -264,9 +264,9 @@ class Descriptor(object):
 
   @ndb.tasklet
   def _BotTestPaths(self):
-    master, slave = self.bot.split(':')
-    aliases = yield bot_configurations.GetAliasesAsync(slave)
-    raise ndb.Return({master + '/' + alias for alias in aliases})
+    main, subordinate = self.bot.split(':')
+    aliases = yield bot_configurations.GetAliasesAsync(subordinate)
+    raise ndb.Return({main + '/' + alias for alias in aliases})
 
   @ndb.tasklet
   def _AppendTestSuite(self, test_paths):

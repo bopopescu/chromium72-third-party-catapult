@@ -107,15 +107,15 @@ class SpeedReleasingHandler(request_handler.RequestHandler):
             'error': 'No data for that milestone.'}))
         return
 
-    master_bot_pairs = _GetMasterBotPairs(table_entity.bots)
+    main_bot_pairs = _GetMainBotPairs(table_entity.bots)
     rev_a, rev_b, milestone_dict = _GetRevisionsFromParams(
-        rev_a, rev_b, milestone_param, table_entity, master_bot_pairs)
+        rev_a, rev_b, milestone_param, table_entity, main_bot_pairs)
 
     revisions = [rev_b, rev_a] # In reverse intentionally. This is to support
     # the format of the Chrome Health Dashboard which compares 'Current' to
     # 'Reference', in that order. The ordering here is for display only.
-    display_a = _GetDisplayRev(master_bot_pairs, table_entity.tests, rev_a)
-    display_b = _GetDisplayRev(master_bot_pairs, table_entity.tests, rev_b)
+    display_a = _GetDisplayRev(main_bot_pairs, table_entity.tests, rev_a)
+    display_b = _GetDisplayRev(main_bot_pairs, table_entity.tests, rev_b)
 
     display_milestone_a, display_milestone_b = _GetMilestoneForRevs(
         rev_a, rev_b, milestone_dict)
@@ -126,16 +126,16 @@ class SpeedReleasingHandler(request_handler.RequestHandler):
     self.GetDynamicVariables(values)
     self.response.out.write(json.dumps({
         'xsrf_token': values['xsrf_token'],
-        'table_bots': master_bot_pairs,
+        'table_bots': main_bot_pairs,
         'table_tests': table_entity.tests,
         'table_layout': json.loads(table_entity.table_layout),
         'name': table_entity.key.string_id(),
-        'values': _GetRowValues(revisions, master_bot_pairs,
+        'values': _GetRowValues(revisions, main_bot_pairs,
                                 table_entity.tests),
-        'units': _GetTestToUnitsMap(master_bot_pairs, table_entity.tests),
+        'units': _GetTestToUnitsMap(main_bot_pairs, table_entity.tests),
         'revisions': revisions,
         'categories': _GetCategoryCounts(json.loads(table_entity.table_layout)),
-        'urls': _GetDashboardURLMap(master_bot_pairs, table_entity.tests,
+        'urls': _GetDashboardURLMap(main_bot_pairs, table_entity.tests,
                                     rev_a, rev_b),
         'display_revisions': [display_b, display_a], # Similar to revisions.
         'display_milestones': [display_milestone_a, display_milestone_b],
@@ -175,9 +175,9 @@ class SpeedReleasingHandler(request_handler.RequestHandler):
             'error': 'No data for that milestone.'}))
         return
 
-    master_bot_pairs = _GetMasterBotPairs(table_entity.bots)
+    main_bot_pairs = _GetMainBotPairs(table_entity.bots)
     rev_a, rev_b, _ = _GetRevisionsFromParams(rev_a, rev_b, milestone_param,
-                                              table_entity, master_bot_pairs)
+                                              table_entity, main_bot_pairs)
     revisions = [rev_b, rev_a]
 
     anomalies = _FetchAnomalies(table_entity, rev_a, rev_b)
@@ -193,8 +193,8 @@ class SpeedReleasingHandler(request_handler.RequestHandler):
 
 
 def _GetRevisionsFromParams(rev_a, rev_b, milestone_param, table_entity,
-                            master_bot_pairs):
-  milestone_dict = _GetUpdatedMilestoneDict(master_bot_pairs,
+                            main_bot_pairs):
+  milestone_dict = _GetUpdatedMilestoneDict(main_bot_pairs,
                                             table_entity.tests)
   if milestone_param:
     rev_a, rev_b = milestone_dict[milestone_param]
@@ -205,11 +205,11 @@ def _GetRevisionsFromParams(rev_a, rev_b, milestone_param, table_entity,
   return rev_a, rev_b, milestone_dict
 
 
-def _GetMasterBotPairs(bots):
-  master_bot_pairs = []
+def _GetMainBotPairs(bots):
+  main_bot_pairs = []
   for bot in bots:
-    master_bot_pairs.append(bot.parent().string_id() + '/' + bot.string_id())
-  return master_bot_pairs
+    main_bot_pairs.append(bot.parent().string_id() + '/' + bot.string_id())
+  return main_bot_pairs
 
 
 def _GetRowValues(revisions, bots, tests):
@@ -217,7 +217,7 @@ def _GetRowValues(revisions, bots, tests):
 
   Args:
     revisions: The revisions to get values for.
-    bots: The Master/Bot pairs the tables cover.
+    bots: The Main/Bot pairs the tables cover.
     tests: The tests that go in each table.
 
   Returns:
@@ -298,7 +298,7 @@ def _GetDashboardURLMap(bots, tests, rev_a, rev_b):
       if len(test_parts) > 1:
         checked = test_parts[len(test_parts) - 1]
       url_args = {
-          'masters': bot_parts[0],
+          'mains': bot_parts[0],
           'bots': bot_parts[1],
           'tests': test,
           'checked': checked,
@@ -311,14 +311,14 @@ def _GetDashboardURLMap(bots, tests, rev_a, rev_b):
 
 def _GetDisplayRev(bots, tests, rev):
   """Creates a user friendly commit position to display.
-  For V8 and ChromiumPerf masters, this will just be the passed in rev.
+  For V8 and ChromiumPerf mains, this will just be the passed in rev.
   """
   if bots and tests:
     test_path = bots[0] + '/' + tests[0]
     test_key = utils.TestKey(test_path)
     row_key = utils.GetRowKey(test_key, rev)
     row = row_key.get()
-    if row and hasattr(row, 'r_commit_pos'): # Rule out masters like V8
+    if row and hasattr(row, 'r_commit_pos'): # Rule out mains like V8
       if rev != row.r_commit_pos: # Rule out ChromiumPerf
         if hasattr(row, 'a_default_rev') and hasattr(row, row.a_default_rev):
           return row.r_commit_pos + '-' + getattr(row, row.a_default_rev)[:3]
@@ -383,32 +383,32 @@ def _GetEndRevOrCurrentMilestoneRevs(rev_a, rev_b, milestone_dict):
   return (rev_a or rev_b), _GetEndOfMilestone((rev_a or rev_b), milestone_dict)
 
 
-def _GetUpdatedMilestoneDict(master_bot_pairs, tests):
+def _GetUpdatedMilestoneDict(main_bot_pairs, tests):
   """Gets the milestone_dict with the newest rev.
 
   Checks to see which milestone_dict to use (Clank/Chromium), and updates
   the 'None' to be the newest revision for one of the specified tests.
   """
-  masters = set([m.split('/')[0] for m in master_bot_pairs])
-  if 'ClankInternal' in masters:
+  mains = set([m.split('/')[0] for m in main_bot_pairs])
+  if 'ClankInternal' in mains:
     milestone_dict = CLANK_MILESTONES.copy()
   else:
     milestone_dict = CHROMIUM_MILESTONES.copy()
   # If we might access the end of the milestone_dict, update it to
   # be the newest revision instead of 'None'.
-  _UpdateNewestRevInMilestoneDict(master_bot_pairs,
+  _UpdateNewestRevInMilestoneDict(main_bot_pairs,
                                   tests, milestone_dict)
   return milestone_dict
 
 
 def _FetchAnomalies(table_entity, rev_a, rev_b):
-  """Finds anomalies that have the given benchmark/master, in a given range."""
+  """Finds anomalies that have the given benchmark/main, in a given range."""
   if table_entity.bots and table_entity.tests:
-    master_list = []
+    main_list = []
     benchmark_list = []
     for bot in table_entity.bots:
-      if bot.parent().string_id() not in master_list:
-        master_list.append(bot.parent().string_id())
+      if bot.parent().string_id() not in main_list:
+        main_list.append(bot.parent().string_id())
     for test in table_entity.tests:
       if test.split('/')[0] not in benchmark_list:
         benchmark_list.append(test.split('/')[0])
@@ -417,12 +417,12 @@ def _FetchAnomalies(table_entity, rev_a, rev_b):
 
   anomalies_futures = []
   for benchmark in benchmark_list:
-    for master in master_list:
+    for main in main_list:
       anomalies_futures.append(anomaly.Anomaly.QueryAsync(
           min_end_revision=rev_a,
           max_end_revision=rev_b,
           test_suite_name=benchmark,
-          master_name=master))
+          main_name=main))
 
   ndb.Future.wait_all(anomalies_futures)
   all_anomalies = [future.get_result()[0] for future in anomalies_futures]

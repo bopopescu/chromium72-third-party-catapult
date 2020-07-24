@@ -25,33 +25,33 @@ class ListMonitoredTestsTest(testing_common.TestCase):
 
   def _AddSampleTestData(self):
     """Adds some sample data used in the tests below."""
-    master = graph_data.Master(id='TheMaster').put()
-    graph_data.Bot(id='TheBot', parent=master).put()
-    t = graph_data.TestMetadata(id='TheMaster/TheBot/Suite1')
+    main = graph_data.Main(id='TheMain').put()
+    graph_data.Bot(id='TheBot', parent=main).put()
+    t = graph_data.TestMetadata(id='TheMain/TheBot/Suite1')
     t.UpdateSheriff()
     t.put()
 
-    t = graph_data.TestMetadata(id='TheMaster/TheBot/Suite2')
-    t.UpdateSheriff()
-    t.put()
-
-    t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite1/aaa', has_rows=True)
+    t = graph_data.TestMetadata(id='TheMain/TheBot/Suite2')
     t.UpdateSheriff()
     t.put()
 
     t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite1/bbb', has_rows=True)
+        id='TheMain/TheBot/Suite1/aaa', has_rows=True)
     t.UpdateSheriff()
     t.put()
 
     t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite2/ccc', has_rows=True)
+        id='TheMain/TheBot/Suite1/bbb', has_rows=True)
     t.UpdateSheriff()
     t.put()
 
     t = graph_data.TestMetadata(
-        id='TheMaster/TheBot/Suite2/ddd', has_rows=True)
+        id='TheMain/TheBot/Suite2/ccc', has_rows=True)
+    t.UpdateSheriff()
+    t.put()
+
+    t = graph_data.TestMetadata(
+        id='TheMain/TheBot/Suite2/ddd', has_rows=True)
     t.UpdateSheriff()
     t.put()
 
@@ -68,7 +68,7 @@ class ListMonitoredTestsTest(testing_common.TestCase):
     response = self.testapp.get(
         '/list_monitored_tests', {'get-sheriffed-by': 'X'})
     self.assertEqual(
-        ['TheMaster/TheBot/Suite1/aaa', 'TheMaster/TheBot/Suite1/bbb'],
+        ['TheMain/TheBot/Suite1/aaa', 'TheMain/TheBot/Suite1/bbb'],
         json.loads(response.body))
 
   def testGet_NoParameterGiven_ReturnsError(self):

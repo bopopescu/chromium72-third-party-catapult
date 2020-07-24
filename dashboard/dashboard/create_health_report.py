@@ -64,12 +64,12 @@ class CreateHealthReportHandler(request_handler.RequestHandler):
   def _GetTableConfigDetails(self, config_name):
     config_entity = ndb.Key('TableConfig', config_name).get()
     if config_entity:
-      master_bot_list = []
+      main_bot_list = []
       for bot in config_entity.bots:
-        master_bot_list.append(bot.parent().string_id() + '/' + bot.string_id())
+        main_bot_list.append(bot.parent().string_id() + '/' + bot.string_id())
       self.response.out.write(json.dumps({
           'table_name': config_name,
-          'table_bots': master_bot_list,
+          'table_bots': main_bot_list,
           'table_tests': config_entity.tests,
           'table_layout': config_entity.table_layout
       }))
@@ -82,12 +82,12 @@ class CreateHealthReportHandler(request_handler.RequestHandler):
     """Creates a table config. Writes a valid name or an error message."""
     self._ValidateToken()
     name = self.request.get('tableName')
-    master_bot = self.request.get('tableBots').splitlines()
+    main_bot = self.request.get('tableBots').splitlines()
     tests = self.request.get('tableTests').splitlines()
     table_layout = self.request.get('tableLayout')
     override = int(self.request.get('override'))
     user = users.get_current_user()
-    if not name or not master_bot or not tests or not table_layout or not user:
+    if not name or not main_bot or not tests or not table_layout or not user:
       self.response.out.write(json.dumps({
           'error': 'Please fill out the form entirely.'
           }))
@@ -95,7 +95,7 @@ class CreateHealthReportHandler(request_handler.RequestHandler):
 
     try:
       created_table = table_config.CreateTableConfig(
-          name=name, bots=master_bot, tests=tests, layout=table_layout,
+          name=name, bots=main_bot, tests=tests, layout=table_layout,
           username=user.email(), override=override)
     except table_config.BadRequestError as error:
       self.response.out.write(json.dumps({

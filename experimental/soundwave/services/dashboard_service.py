@@ -42,7 +42,7 @@ def Timeseries2(**kwargs):
   Args:
     test_suite: A string with the test suite or benchmark name.
     measurement: A string with the metric name, e.g. timeToFirstContentfulPaint.
-    bot: A string with the bot name, usually of the form 'master:builder'.
+    bot: A string with the bot name, usually of the form 'main:builder'.
     columns: A string with a comma separated list of colum names to retrieve;
       may contain: revision, avg, std, count, max, min, sum, revisions,
       timestamp, alert, histogram, diagnostics.

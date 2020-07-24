@@ -55,7 +55,7 @@ class UtilsTest(testing_common.TestCase):
         'ChromiumPerf/cros-*/dromaeo.*/Total')
     self._AssertDoesntMatch(
         'ChromiumPerf/cros-one/dromaeo.top25/Total',
-        'OtherMaster/cros-*/dromaeo.*/Total')
+        'OtherMain/cros-*/dromaeo.*/Total')
 
   def testMatchesPattern_MorePartialWildcards(self):
     # Note that the wildcard matches zero or more characters.
@@ -119,8 +119,8 @@ class UtilsTest(testing_common.TestCase):
 
   def _PutEntitiesAllExternal(self):
     """Puts entities (none internal-only) and returns the keys."""
-    master = graph_data.Master(id='M').put()
-    graph_data.Bot(parent=master, id='b').put()
+    main = graph_data.Main(id='M').put()
+    graph_data.Bot(parent=main, id='b').put()
     keys = [
         graph_data.TestMetadata(id='M/b/a', internal_only=False),
         graph_data.TestMetadata(id='M/b/b', internal_only=False),
@@ -136,8 +136,8 @@ class UtilsTest(testing_common.TestCase):
 
   def _PutEntitiesHalfInternal(self):
     """Puts entities (half internal-only) and returns the keys."""
-    master = graph_data.Master(id='M').put()
-    graph_data.Bot(parent=master, id='b').put()
+    main = graph_data.Main(id='M').put()
+    graph_data.Bot(parent=main, id='b').put()
     keys = [
         graph_data.TestMetadata(id='M/b/ax', internal_only=True),
         graph_data.TestMetadata(id='M/b/a', internal_only=False),
@@ -172,7 +172,7 @@ class UtilsTest(testing_common.TestCase):
     self.assertEqual(len(keys), len(utils.GetMulti(keys)))
 
   def testTestPath_Test(self):
-    key = ndb.Key('Master', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric')
+    key = ndb.Key('Main', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric')
     self.assertEqual('m/b/suite/metric', utils.TestPath(key))
 
   def testTestPath_TestMetadata(self):
@@ -189,7 +189,7 @@ class UtilsTest(testing_common.TestCase):
 
   def testTestMetadataKey_Test(self):
     key = utils.TestMetadataKey(
-        ndb.Key('Master', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric'))
+        ndb.Key('Main', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric'))
     self.assertEqual('TestMetadata', key.kind())
     self.assertEqual('m/b/suite/metric', key.id())
     self.assertEqual(('TestMetadata', 'm/b/suite/metric'), key.flat())
@@ -211,7 +211,7 @@ class UtilsTest(testing_common.TestCase):
 
   def testOldStyleTestKey_Test(self):
     original_key = ndb.Key(
-        'Master', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric')
+        'Main', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric')
     key = utils.OldStyleTestKey(original_key)
     self.assertEqual(original_key, key)
 
@@ -220,7 +220,7 @@ class UtilsTest(testing_common.TestCase):
     self.assertEqual('Test', key.kind())
     self.assertEqual('metric', key.id())
     self.assertEqual(
-        ('Master', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric'),
+        ('Main', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric'),
         key.flat())
 
   def testOldStyleTestKey_String(self):
@@ -228,11 +228,11 @@ class UtilsTest(testing_common.TestCase):
     self.assertEqual('Test', key.kind())
     self.assertEqual('metric', key.id())
     self.assertEqual(
-        ('Master', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric'),
+        ('Main', 'm', 'Bot', 'b', 'Test', 'suite', 'Test', 'metric'),
         key.flat())
 
   def testTestSuiteName_Basic(self):
-    key = utils.TestKey('Master/bot/suite-foo/sub/x/y/z')
+    key = utils.TestKey('Main/bot/suite-foo/sub/x/y/z')
     self.assertEqual('suite-foo', utils.TestSuiteName(key))
 
   def testMinimumRange_Empty_ReturnsNone(self):
@@ -304,35 +304,35 @@ class UtilsTest(testing_common.TestCase):
     utils.Validate([1], '1')
 
   def testGetBuildDetailsFromStdioLink_InvalidLink(self):
-    base_url, master, bot, number, step = utils.GetBuildDetailsFromStdioLink(
+    base_url, main, bot, number, step = utils.GetBuildDetailsFromStdioLink(
         '[Buildbot stdio](http://notquite/builders/whatever/234)')
     self.assertIsNone(base_url)
-    self.assertIsNone(master)
+    self.assertIsNone(main)
     self.assertIsNone(bot)
     self.assertIsNone(number)
     self.assertIsNone(step)
 
   def testGetBuildDetailsFromStdioLink(self):
-    base_url, master, bot, number, step = utils.GetBuildDetailsFromStdioLink((
+    base_url, main, bot, number, step = utils.GetBuildDetailsFromStdioLink((
         '[Buildbot stdio](https://build.chromium.org/p/chromium.perf/builders/'
         'Android%20One%20Perf%20%282%29/builds/5365/steps/'
         'blink_style.top_25/logs/stdio)'))
     self.assertEqual('https://build.chromium.org/p/chromium.perf/builders/',
                      base_url)
-    self.assertEqual('chromium.perf', master)
+    self.assertEqual('chromium.perf', main)
     self.assertEqual('Android One Perf (2)', bot)
     self.assertEqual('5365', number)
     self.assertEqual('blink_style.top_25', step)
 
   def testGetBuildDetailsFromStdioLink_DifferentBaseUrl(self):
-    base_url, master, bot, number, step = utils.GetBuildDetailsFromStdioLink((
+    base_url, main, bot, number, step = utils.GetBuildDetailsFromStdioLink((
         '[Buildbot stdio]('
         'https://uberchromegw.corp.google.com/i/new.master/builders/Builder/'
         'builds/3486/steps/new_test/logs/stdio)'))
     self.assertEqual(
         'https://uberchromegw.corp.google.com/i/new.master/builders/',
         base_url)
-    self.assertEqual('new.master', master)
+    self.assertEqual('new.main', main)
     self.assertEqual('Builder', bot)
     self.assertEqual('3486', number)
     self.assertEqual('new_test', step)

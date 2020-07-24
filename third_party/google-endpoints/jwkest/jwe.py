@@ -616,7 +616,7 @@ class JWE(JWx):
         :param keys: A set of possibly usable keys
         :param context: If the other party's public or my private key should be
             used for encryption
-        :param cek: Content master key
+        :param cek: Content main key
         :param iv: Initialization vector
         :param kwargs: Extra key word arguments
         :return: Encrypted message

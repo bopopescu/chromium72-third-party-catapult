@@ -133,15 +133,15 @@ def _MakeBisectTryJob(bug_id, test_anomaly, test):
   metric = start_try_job.GuessMetric(test.test_path)
   story_filter = start_try_job.GuessStoryFilter(test.test_path)
 
-  bisect_bot = start_try_job.GuessBisectBot(test.master_name, test.bot_name)
+  bisect_bot = start_try_job.GuessBisectBot(test.main_name, test.bot_name)
   if not bisect_bot:
     raise NotBisectableError(
         'Could not select a bisect bot: %s for (%s, %s)' % (
-            bisect_bot, test.master_name, test.bot_name))
+            bisect_bot, test.main_name, test.bot_name))
 
   new_bisect_config = start_try_job.GetBisectConfig(
       bisect_bot=bisect_bot,
-      master_name=test.master_name,
+      main_name=test.main_name,
       suite=test.suite_name,
       metric=metric,
       story_filter=story_filter,
@@ -160,7 +160,7 @@ def _MakeBisectTryJob(bug_id, test_anomaly, test):
       bot=bisect_bot,
       config=config_python_string,
       bug_id=bug_id,
-      master_name=test.master_name,
+      main_name=test.main_name,
       internal_only=test.internal_only,
       job_type='bisect')
 

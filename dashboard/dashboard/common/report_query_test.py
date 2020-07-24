@@ -36,7 +36,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testBotAliases(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/a/suite/measure',
+        id='main/a/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -45,7 +45,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/b/suite/measure',
+        id='main/b/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -56,7 +56,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:b'],
+                'bots': ['main:b'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -74,7 +74,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testEmptyTestCases(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure',
+        id='main/bot/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -85,7 +85,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -103,7 +103,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testMultipleRevisions(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure',
+        id='main/bot/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -116,7 +116,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -143,7 +143,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testLatestRevision(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure',
+        id='main/bot/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -155,7 +155,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -172,7 +172,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testMultipleRows(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/a',
+        id='main/bot/suite/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -181,7 +181,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/b',
+        id='main/bot/suite/b',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -192,13 +192,13 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'a',
                 'testCases': [],
             },
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'b',
                 'testCases': [],
             },
@@ -218,7 +218,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testMultipleTestSuites(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/a/measure',
+        id='main/bot/a/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -227,7 +227,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/b/measure',
+        id='main/bot/b/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -238,7 +238,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['a', 'b'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -254,7 +254,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testMultipleBots(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/a/suite/measure',
+        id='main/a/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -263,7 +263,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/b/suite/measure',
+        id='main/b/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -274,7 +274,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:a', 'master:b'],
+                'bots': ['main:a', 'main:b'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -290,7 +290,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testMultipleTestCases(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/a',
+        id='main/bot/suite/measure/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -299,7 +299,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/b',
+        id='main/bot/suite/measure/b',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -310,7 +310,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': ['a', 'b'],
             },
@@ -326,7 +326,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testIgnoreNewTestCases(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/a',
+        id='main/bot/suite/measure/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -336,7 +336,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/b',
+        id='main/bot/suite/measure/b',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -347,7 +347,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': ['a', 'b'],
             },
@@ -368,7 +368,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testCloseRevisions(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/a',
+        id='main/bot/suite/measure/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -378,7 +378,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/b',
+        id='main/bot/suite/measure/b',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -390,7 +390,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': ['a', 'b'],
             },
@@ -412,7 +412,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testIgnoreRemovedTestCases(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/a',
+        id='main/bot/suite/measure/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -422,7 +422,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/b',
+        id='main/bot/suite/measure/b',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -433,7 +433,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': ['a', 'b'],
             },
@@ -454,7 +454,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testOldStyleUnsuffixedDataRows(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure',
+        id='main/bot/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -465,7 +465,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -485,7 +485,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testNewStyleUnsuffixedDataRows(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure',
+        id='main/bot/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -504,7 +504,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -524,7 +524,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testSuffixedDataRows(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_avg',
+        id='main/bot/suite/measure_avg',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -533,7 +533,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_std',
+        id='main/bot/suite/measure_std',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -542,7 +542,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_count',
+        id='main/bot/suite/measure_count',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -551,7 +551,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_min',
+        id='main/bot/suite/measure_min',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -560,7 +560,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_max',
+        id='main/bot/suite/measure_max',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -571,7 +571,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -593,7 +593,7 @@ class ReportQueryTest(testing_common.TestCase):
     # Unsuffixed tests without data rows should fall back.
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_avg',
+        id='main/bot/suite/measure_avg',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -602,7 +602,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure',
+        id='main/bot/suite/measure',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -612,7 +612,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': [],
             },
@@ -628,7 +628,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testIgnoreSuffixedDataRowsMissingAvg(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_avg/a',
+        id='main/bot/suite/measure_avg/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -637,7 +637,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_std/a',
+        id='main/bot/suite/measure_std/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -646,7 +646,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_std/b',
+        id='main/bot/suite/measure_std/b',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -655,7 +655,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_count/a',
+        id='main/bot/suite/measure_count/a',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -664,7 +664,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_count/b',
+        id='main/bot/suite/measure_count/b',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -673,7 +673,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_min/a',
+        id='main/bot/suite/measure_min/a',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -682,7 +682,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_min/b',
+        id='main/bot/suite/measure_min/b',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -691,7 +691,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_max/a',
+        id='main/bot/suite/measure_max/a',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -700,7 +700,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure_max/b',
+        id='main/bot/suite/measure_max/b',
         improvement_direction=anomaly.DOWN,
         units='count')
     test.UpdateSheriff()
@@ -711,7 +711,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': ['a', 'b'],
             },
@@ -736,7 +736,7 @@ class ReportQueryTest(testing_common.TestCase):
   def testIgnoreWrongUnits(self):
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/a',
+        id='main/bot/suite/measure/a',
         improvement_direction=anomaly.DOWN,
         units='units')
     test.UpdateSheriff()
@@ -745,7 +745,7 @@ class ReportQueryTest(testing_common.TestCase):
 
     test = graph_data.TestMetadata(
         has_rows=True,
-        id='master/bot/suite/measure/b',
+        id='main/bot/suite/measure/b',
         improvement_direction=anomaly.DOWN,
         units='wrong')
     test.UpdateSheriff()
@@ -756,7 +756,7 @@ class ReportQueryTest(testing_common.TestCase):
         'rows': [
             {
                 'testSuites': ['suite'],
-                'bots': ['master:bot'],
+                'bots': ['main:bot'],
                 'measurement': 'measure',
                 'testCases': ['a', 'b'],
             },

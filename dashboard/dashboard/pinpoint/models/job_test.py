@@ -200,13 +200,13 @@ class BugCommentTest(test.TestCase):
 
     j = job.Job.New(
         (), (), bug_id=123456, comparison_mode='performance',
-        tags={'test_path': 'master/bot/benchmark'})
+        tags={'test_path': 'main/bot/benchmark'})
 
     diag_dict = generic_set.GenericSet([[u'Benchmark doc link', u'http://docs']])
     diag = histogram.SparseDiagnostic(
         data=diag_dict.AsDict(), start_revision=1, end_revision=sys.maxint,
         name=reserved_infos.DOCUMENTATION_URLS.name,
-        test=utils.TestKey('master/bot/benchmark'))
+        test=utils.TestKey('main/bot/benchmark'))
     diag.put()
 
     j.Run()

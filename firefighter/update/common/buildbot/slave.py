@@ -8,16 +8,16 @@ import mimetools
 from common.buildbot import network
 
 
-def Slaves(master_name):
-  slave_data = network.FetchData(network.BuildUrl(master_name, 'json/slaves'))
-  return sorted(Slave(master_name, slave_name, slave_info)
-                for slave_name, slave_info in slave_data.iteritems())
+def Subordinates(main_name):
+  subordinate_data = network.FetchData(network.BuildUrl(main_name, 'json/subordinates'))
+  return sorted(Subordinate(main_name, subordinate_name, subordinate_info)
+                for subordinate_name, subordinate_info in subordinate_data.iteritems())
 
 
-class Slave(object):
+class Subordinate(object):
 
-  def __init__(self, master_name, name, data):
-    self._master_name = master_name
+  def __init__(self, main_name, name, data):
+    self._main_name = main_name
     self._name = name
 
     self._builders = frozenset(data['builders'].keys())
@@ -50,8 +50,8 @@ class Slave(object):
     return self.name
 
   @property
-  def master_name(self):
-    return self._master_name
+  def main_name(self):
+    return self._main_name
 
   @property
   def name(self):

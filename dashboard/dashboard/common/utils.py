@@ -122,7 +122,7 @@ def TestPath(key):
     A test path string.
   """
   if key.kind() == 'Test':
-    # The Test key looks like ('Master', 'name', 'Bot', 'name', 'Test' 'name'..)
+    # The Test key looks like ('Main', 'name', 'Bot', 'name', 'Test' 'name'..)
     # Pull out every other entry and join with '/' to form the path.
     return '/'.join(key.flat()[1::2])
   assert key.kind() == 'TestMetadata' or key.kind() == 'TestContainer'
@@ -144,7 +144,7 @@ def TestKey(test_path):
   if path_parts is None:
     return None
   if len(path_parts) < 3:
-    key_list = [('Master', path_parts[0])]
+    key_list = [('Main', path_parts[0])]
     if len(path_parts) > 1:
       key_list += [('Bot', path_parts[1])]
     return ndb.Key(pairs=key_list)
@@ -194,7 +194,7 @@ def OldStyleTestKey(key_or_string):
     key_or_string = key_or_string.id()
   assert isinstance(key_or_string, basestring)
   path_parts = key_or_string.split('/')
-  key_parts = ['Master', path_parts[0], 'Bot', path_parts[1]]
+  key_parts = ['Main', path_parts[0], 'Bot', path_parts[1]]
   for part in path_parts[2:]:
     key_parts += ['Test', part]
   return ndb.Key(*key_parts)
@@ -206,7 +206,7 @@ def MostSpecificMatchingPattern(test, pattern_data_tuples):
   ordering the matching patterns, and choosing the one with the most specific
   top level match.
 
-  For example, if there was a test Master/Bot/Foo/Bar, then:
+  For example, if there was a test Main/Bot/Foo/Bar, then:
 
   */*/*/Bar would match more closely than */*/*/*
   */*/*/Bar would match more closely than */*/*/Bar.*
@@ -597,9 +597,9 @@ def GetBuildDetailsFromStdioLink(stdio_link):
   if not m:
     # This wasn't a buildbot formatted link.
     return no_details
-  base_url, master, bot, buildnumber, step = m.groups()
+  base_url, main, bot, buildnumber, step = m.groups()
   bot = urllib.unquote(bot)
-  return base_url, master, bot, buildnumber, step
+  return base_url, main, bot, buildnumber, step
 
 
 def GetStdioLinkFromRow(row):
@@ -622,14 +622,14 @@ def GetBuildbotStatusPageUriFromStdioLink(stdio_link):
 
 
 def GetLogdogLogUriFromStdioLink(stdio_link):
-  base_url, master, bot, buildnumber, step = GetBuildDetailsFromStdioLink(
+  base_url, main, bot, buildnumber, step = GetBuildDetailsFromStdioLink(
       stdio_link)
   if not base_url:
     # Can't parse status page
     return None
   bot = re.sub(r'[ \(\)]', '_', bot)
   s_param = urllib.quote('chrome/bb/%s/%s/%s/+/recipes/steps/%s/0/stdout' % (
-      master, bot, buildnumber, step), safe='')
+      main, bot, buildnumber, step), safe='')
   return 'https://luci-logdog.appspot.com/v/?s=%s' % s_param
 
 def GetRowKey(testmetadata_key, revision):

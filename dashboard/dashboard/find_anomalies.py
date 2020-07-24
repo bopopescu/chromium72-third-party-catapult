@@ -344,7 +344,7 @@ def _MakeAnomalyEntity(change_point, test, stat, rows):
   end_rev = change_point.x_value
   start_rev = _GetImmediatelyPreviousRevisionNumber(end_rev, rows) + 1
   display_start = display_end = None
-  if test.master_name == 'ClankInternal':
+  if test.main_name == 'ClankInternal':
     display_start, display_end = _GetDisplayRange(change_point.x_value, rows)
   median_before = change_point.median_before
   median_after = change_point.median_after

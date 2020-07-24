@@ -88,6 +88,6 @@ def _IsHash(git_hash):
   """Returns True iff git_hash is a full SHA-1 hash.
 
   Commits keyed by full git hashes are guaranteed to not change. It's unsafe
-  to cache things that can change (e.g. `HEAD`, `master`, tag names)
+  to cache things that can change (e.g. `HEAD`, `main`, tag names)
   """
   return git_hash.isalnum() and len(git_hash) == 40

@@ -17,7 +17,7 @@ class DeleteAllEntitiesTest(testing_common.TestCase):
 
   def testOnlyDeleteKind(self):
     anomaly.Anomaly(id='anomaly', test=utils.TestMetadataKey(
-        'master/bot/suite/measurement')).put()
+        'main/bot/suite/measurement')).put()
     page_state.PageState(id='page_state').put()
     self.assertEqual(1, len(ndb.Query(kind='PageState').fetch(keys_only=True)))
     self.assertEqual(1, len(ndb.Query(kind='Anomaly').fetch(keys_only=True)))

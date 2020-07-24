@@ -18,8 +18,8 @@ _UNBISECTABLE_SUITES = [
 ]
 
 # The bisect bot map stored in datastore is expected to be
-# a dict mapping master names to [perf bot, bisect bot] pairs.
-# If a master name is not in the dict, bisect isn't supported.
+# a dict mapping main names to [perf bot, bisect bot] pairs.
+# If a main name is not in the dict, bisect isn't supported.
 BISECT_BOT_MAP_KEY = 'bisect_bot_map'
 
 
@@ -30,7 +30,7 @@ def IsValidTestForBisect(test_path):
   path_parts = test_path.split('/')
   if len(path_parts) < 3:
     return False
-  if not _MasterNameIsWhitelisted(path_parts[0]):
+  if not _MainNameIsWhitelisted(path_parts[0]):
     return False
   if path_parts[2] in _UNBISECTABLE_SUITES:
     return False
@@ -39,13 +39,13 @@ def IsValidTestForBisect(test_path):
   return True
 
 
-def _MasterNameIsWhitelisted(master_name):
-  """Checks whether a master name is acceptable by checking a whitelist."""
+def _MainNameIsWhitelisted(main_name):
+  """Checks whether a main name is acceptable by checking a whitelist."""
   bisect_bot_map = namespaced_stored_object.Get(BISECT_BOT_MAP_KEY)
   if not bisect_bot_map:
     return True  # If there's no list available, all names are OK.
-  whitelisted_masters = list(bisect_bot_map)
-  return master_name in whitelisted_masters
+  whitelisted_mains = list(bisect_bot_map)
+  return main_name in whitelisted_mains
 
 
 def IsValidRevisionForBisect(revision):

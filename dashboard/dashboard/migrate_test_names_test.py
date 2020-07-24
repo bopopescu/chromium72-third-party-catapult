@@ -16,7 +16,7 @@ from dashboard.models import histogram
 from dashboard.models import sheriff
 from tracing.value.diagnostics import generic_set
 
-# Masters, bots and test names to add to the mock datastore.
+# Mains, bots and test names to add to the mock datastore.
 _MOCK_DATA = [
     ['ChromiumPerf', 'ChromiumWebkit'],
     ['win7', 'mac'],
@@ -122,13 +122,13 @@ class MigrateTestNamesTest(testing_common.TestCase):
     """Checks whether the current TestMetadata entities match the expected list.
 
     Args:
-      expected_tests: List of test paths without the master/bot part.
+      expected_tests: List of test paths without the main/bot part.
     """
-    for master in _MOCK_DATA[0]:
+    for main in _MOCK_DATA[0]:
       for bot in _MOCK_DATA[1]:
-        expected = ['%s/%s/%s' % (master, bot, t) for t in expected_tests]
+        expected = ['%s/%s/%s' % (main, bot, t) for t in expected_tests]
         tests = graph_data.TestMetadata.query(
-            graph_data.TestMetadata.master_name == master,
+            graph_data.TestMetadata.main_name == main,
             graph_data.TestMetadata.bot_name == bot
         ).fetch()
         actual = [t.test_path for t in tests]

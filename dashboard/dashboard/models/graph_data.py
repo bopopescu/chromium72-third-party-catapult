@@ -6,14 +6,14 @@
 
 The Chromium project uses Buildbot to run its performance tests, and the
 structure of the data for the Performance Dashboard reflects this. Metadata
-about tests are structured in Master, Bot, and TestMetadata entities. Master and
-Bot entities represent Buildbot masters and builders respectively, and
+about tests are structured in Main, Bot, and TestMetadata entities. Main and
+Bot entities represent Buildbot mains and builders respectively, and
 TestMetadata entities represent groups of results, or individual data series,
 keyed by a full path to the test separated by '/' characters.
 
 For example, entities might be structured as follows:
 
-  Master: ChromiumPerf
+  Main: ChromiumPerf
   Bot: win7
   TestMetadata: ChromiumPerf/win7/page_cycler.moz
   TestMetadata: ChromiumPerf/win7/page_cycler.moz/times
@@ -76,39 +76,39 @@ LIST_TESTS_SUBTEST_CACHE_KEY = 'list_tests_get_tests_v2_%s_%s_%s'
 _MAX_STRING_LENGTH = 500
 
 
-class Master(ndb.Model):
-  """Information about the Buildbot master.
+class Main(ndb.Model):
+  """Information about the Buildbot main.
 
-  Masters are keyed by name, e.g. 'ChromiumGPU' or 'ChromiumPerf'.
-  All Bot entities that are Buildbot slaves of one master are children of one
-  Master entity in the datastore.
+  Mains are keyed by name, e.g. 'ChromiumGPU' or 'ChromiumPerf'.
+  All Bot entities that are Buildbot subordinates of one main are children of one
+  Main entity in the datastore.
   """
-  # Master has no properties; the name of the master is the ID.
+  # Main has no properties; the name of the main is the ID.
 
 
 class Bot(internal_only_model.InternalOnlyModel):
-  """Information about a Buildbot slave that runs perf tests.
+  """Information about a Buildbot subordinate that runs perf tests.
 
   Bots are keyed by name, e.g. 'xp-release-dual-core'. A Bot entity contains
   information about whether the tests are only viewable to internal users, and
-  each bot has a parent that is a Master entity. To query the tests that run on
-  a Bot, check the bot_name and master_name properties of the TestMetadata.
+  each bot has a parent that is a Main entity. To query the tests that run on
+  a Bot, check the bot_name and main_name properties of the TestMetadata.
   """
   internal_only = ndb.BooleanProperty(default=False, indexed=True)
 
   @classmethod
   @ndb.synctasklet
-  def GetInternalOnlySync(cls, master, bot):
+  def GetInternalOnlySync(cls, main, bot):
     try:
-      internal_only = yield cls.GetInternalOnlyAsync(master, bot)
+      internal_only = yield cls.GetInternalOnlyAsync(main, bot)
       raise ndb.Return(internal_only)
     except AssertionError:
       raise ndb.Return(True)
 
   @staticmethod
   @ndb.tasklet
-  def GetInternalOnlyAsync(master, bot):
-    bot_entity = yield ndb.Key('Master', master, 'Bot', bot).get_async()
+  def GetInternalOnlyAsync(main, bot):
+    bot_entity = yield ndb.Key('Main', main, 'Bot', bot).get_async()
     if bot_entity is None:
       raise ndb.Return(True)
     raise ndb.Return(bot_entity.internal_only)
@@ -124,10 +124,10 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
   has a path one level less deep, which corresponds to a graph with several
   timeseries. A TestMetadata one level less deep for that test would correspond
   to a group of related graphs. Top-level TestMetadata (also known as test
-  suites) are keyed master/bot/test.
+  suites) are keyed main/bot/test.
 
   TestMetadata are keyed by the full path to the test (for example
-  master/bot/test/metric/page), and they also contain other metadata such as
+  main/bot/test/metric/page), and they also contain other metadata such as
   description and units.
 
   NOTE: If you remove any properties from TestMetadata, they should be added to
@@ -190,7 +190,7 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
     if len(parts) != 3:
       # This is not a test suite.
       return None
-    return ndb.Key('Master', parts[0], 'Bot', parts[1])
+    return ndb.Key('Main', parts[0], 'Bot', parts[1])
 
   @ndb.ComputedProperty
   def parent_test(self):  # pylint: disable=invalid-name
@@ -208,11 +208,11 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
 
   @property
   def test_path(self):
-    """Slash-separated list of key parts, 'master/bot/suite/chart/...'."""
+    """Slash-separated list of key parts, 'main/bot/suite/chart/...'."""
     return utils.TestPath(self.key)
 
   @ndb.ComputedProperty
-  def master_name(self):
+  def main_name(self):
     return self.key.id().split('/')[0]
 
   @ndb.ComputedProperty
@@ -259,7 +259,7 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
     return parts[7]
 
   @classmethod
-  def _GetMasterBotSuite(cls, key):
+  def _GetMainBotSuite(cls, key):
     if not key:
       return None
     return tuple(key.id().split('/')[:3])
@@ -285,7 +285,7 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
     """
     # Check to make sure the key is valid.
     # TestMetadata should not be an ancestor, so key.pairs() should have length
-    # of 1. The id should have at least 3 slashes to represent master/bot/suite.
+    # of 1. The id should have at least 3 slashes to represent main/bot/suite.
     assert len(self.key.pairs()) == 1
     path_parts = self.key.id().split('/')
     assert len(path_parts) >= 3
@@ -322,7 +322,7 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
       # Since this is not a test suite, the menu cache for the suite must
       # be updated.
       layered_cache.Delete(
-          LIST_TESTS_SUBTEST_CACHE_KEY % self._GetMasterBotSuite(self.key))
+          LIST_TESTS_SUBTEST_CACHE_KEY % self._GetMainBotSuite(self.key))
 
   @classmethod
   # pylint: disable=unused-argument
@@ -331,7 +331,7 @@ class TestMetadata(internal_only_model.CreateHookInternalOnlyModel):
       # Since this is not a test suite, the menu cache for the suite must
       # be updated.
       layered_cache.Delete(
-          LIST_TESTS_SUBTEST_CACHE_KEY % TestMetadata._GetMasterBotSuite(key))
+          LIST_TESTS_SUBTEST_CACHE_KEY % TestMetadata._GetMainBotSuite(key))
 
 
 class LastAddedRevision(ndb.Model):

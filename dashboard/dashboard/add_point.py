@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""URL endpoint to allow Buildbot slaves to post data to the dashboard."""
+"""URL endpoint to allow Buildbot subordinates to post data to the dashboard."""
 
 import copy
 import json
@@ -58,7 +58,7 @@ class AddPointHandler(post_data_handler.PostDataHandler):
 
       [
         {
-          "master": "ChromiumPerf",
+          "main": "ChromiumPerf",
           "bot": "xp-release-dual-core",
           "test": "dromaeo/dom/modify",
           "revision": 123456789,
@@ -76,7 +76,7 @@ class AddPointHandler(post_data_handler.PostDataHandler):
         ...
       ]
 
-    In general, the required fields are "master", "bot", "test" (which together
+    In general, the required fields are "main", "bot", "test" (which together
     form the test path which identifies the series that this point belongs to),
     and "revision" and "value", which are the X and Y values for the point.
 
@@ -90,7 +90,7 @@ class AddPointHandler(post_data_handler.PostDataHandler):
     v0).
 
     {
-      "master": "ChromiumPerf",
+      "main": "ChromiumPerf",
       <other row fields>,
       "chart_data": {
         "foo": {
@@ -178,8 +178,8 @@ def _ValidateNameString(value, name):
 def _ValidateDashboardJson(dash_json_dict):
   assert isinstance(dash_json_dict, dict)
   # A Dashboard JSON dict should at least have all charts coming from the
-  # same master, bot and rev. It can contain multiple charts, however.
-  _ValidateNameString(dash_json_dict.get('master'), 'master')
+  # same main, bot and rev. It can contain multiple charts, however.
+  _ValidateNameString(dash_json_dict.get('main'), 'main')
   _ValidateNameString(dash_json_dict.get('bot'), 'bot')
 
   if not dash_json_dict.get('point_id'):
@@ -306,7 +306,7 @@ def _MakeRowTemplate(dash_json_dict):
   """Produces a template for rows created from a Dashboard JSON v1.0 dict.
 
   _DashboardJsonToRawRows adds metadata fields to every row that it creates.
-  These include things like master, bot, point ID, versions, and other
+  These include things like main, bot, point ID, versions, and other
   supplementary data. This method produces a dict containing this metadata
   to which row-specific information (like value and error) can be added.
   Some metadata needs to be transformed to conform to the v0 format, and this
@@ -547,9 +547,9 @@ def _ImprovementDirectionToHigherIsBetter(improvement_direction_str):
 
 
 def _GetLastAddedEntityForRow(row):
-  if not ('master' in row and 'bot' in row and 'test' in row):
+  if not ('main' in row and 'bot' in row and 'test' in row):
     return None
-  path = '%s/%s/%s' % (row['master'], row['bot'], row['test'].strip('/'))
+  path = '%s/%s/%s' % (row['main'], row['bot'], row['test'].strip('/'))
   if len(path) > _MAX_TEST_PATH_LENGTH:
     return None
 
@@ -571,16 +571,16 @@ def ValidateRowDict(row):
   Raises:
     BadRequestError: The input was not valid.
   """
-  required_fields = ['master', 'bot', 'test']
+  required_fields = ['main', 'bot', 'test']
   for field in required_fields:
     if field not in row:
       raise BadRequestError('No "%s" field in row dict.' % field)
-  _ValidateMasterBotTest(row['master'], row['bot'], row['test'])
+  _ValidateMainBotTest(row['main'], row['bot'], row['test'])
   GetAndValidateRowProperties(row)
 
 
-def _ValidateMasterBotTest(master, bot, test):
-  """Validates the master, bot, and test properties of a row dict."""
+def _ValidateMainBotTest(main, bot, test):
+  """Validates the main, bot, and test properties of a row dict."""
   # Trailing and leading slashes in the test name are ignored.
   # The test name must consist of at least a test suite plus sub-test.
   test = test.strip('/')
@@ -590,9 +590,9 @@ def _ValidateMasterBotTest(master, bot, test):
   if len(test.split('/')) > graph_data.MAX_TEST_ANCESTORS:
     raise BadRequestError('Invalid test name: %s' % test)
 
-  _ValidateNameString(master, 'master')
+  _ValidateNameString(main, 'main')
   _ValidateNameString(bot, 'bot')
-  _ValidateTestPath('%s/%s/%s' % (master, bot, test))
+  _ValidateTestPath('%s/%s/%s' % (main, bot, test))
 
 
 def _ValidateTestPath(test_path):
@@ -611,7 +611,7 @@ def _ValidateTestPath(test_path):
 
 
 def _ValidateTestPathPartName(name):
-  """Checks whether a Master, Bot or TestMetadata name is OK."""
+  """Checks whether a Main, Bot or TestMetadata name is OK."""
   # NDB Datastore doesn't allow key names to start and with "__" and "__".
   if name.startswith('__') and name.endswith('__'):
     raise BadRequestError(
@@ -631,8 +631,8 @@ def _ValidateRowId(row_dict, last_added_entity):
   row_id = GetAndValidateRowId(row_dict)
 
   # Get the last added revision number for this test.
-  master, bot, test = row_dict['master'], row_dict['bot'], row_dict['test']
-  test_path = '%s/%s/%s' % (master, bot, test)
+  main, bot, test = row_dict['main'], row_dict['bot'], row_dict['test']
+  test_path = '%s/%s/%s' % (main, bot, test)
   if not last_added_entity:
     # Could be first point in test.
     logging.warning('Test %s has no last added revision entry.', test_path)
@@ -641,8 +641,8 @@ def _ValidateRowId(row_dict, last_added_entity):
   last_row_id = last_added_entity.revision
 
   allow_jump = (
-      master.endswith('Internal') or
-      (master.endswith('QA') and bot.startswith('release-tests-')))
+      main.endswith('Internal') or
+      (main.endswith('QA') and bot.startswith('release-tests-')))
   if not _IsAcceptableRowId(row_id, last_row_id, allow_jump=allow_jump):
     raise BadRequestError(
         'Invalid ID (revision) %d; compared to previous ID %s, it was larger '

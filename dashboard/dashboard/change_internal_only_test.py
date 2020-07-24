@@ -22,22 +22,22 @@ class ChangeInternalOnlyTest(testing_common.TestCase):
           test=key, start_revision=15001, end_revision=15005,
           median_before_anomaly=100, median_after_anomaly=200).put()
 
-    internal_master_bots = [
+    internal_main_bots = [
         ('ChromiumPerf', 'win7'),
         ('ChromiumGPU', 'mac'),
     ]
-    change_internal_only.UpdateBots(internal_master_bots, True)
+    change_internal_only.UpdateBots(internal_main_bots, True)
     self.PatchDatastoreHooksRequest()
     self.ExecuteDeferredTasks(change_internal_only.QUEUE_NAME)
 
     for bot in graph_data.Bot.query().fetch():
-      master_name = bot.key.parent().id()
+      main_name = bot.key.parent().id()
       bot_name = bot.key.id()
-      expected = (master_name, bot_name) in internal_master_bots
+      expected = (main_name, bot_name) in internal_main_bots
       self.assertEqual(expected, bot.internal_only)
 
       query = graph_data.TestMetadata.query(
-          graph_data.TestMetadata.master_name == master_name,
+          graph_data.TestMetadata.main_name == main_name,
           graph_data.TestMetadata.bot_name == bot_name)
       for test in query.fetch():
         self.assertEqual(expected, test.internal_only)

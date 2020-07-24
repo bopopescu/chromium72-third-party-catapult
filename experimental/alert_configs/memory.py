@@ -18,7 +18,7 @@ SHERIFFS_URL = 'https://chromeperf.appspot.com/edit_sheriffs'
 
 
 _MemoryAlert = collections.namedtuple('_MemoryAlert', [
-    'master', 'builder', 'benchmark', 'browser', 'process',
+    'main', 'builder', 'benchmark', 'browser', 'process',
     'reported_by', 'allocator', 'size', 'story', 'config', 'rotation'])
 
 
@@ -33,7 +33,7 @@ class MemoryAlert(_MemoryAlert):
   __slots__ = ()
 
   def __new__(cls, **kwargs):
-    kwargs.setdefault('master', 'ChromiumPerf')
+    kwargs.setdefault('main', 'ChromiumPerf')
     kwargs.setdefault('builder', '*')
     kwargs.setdefault('benchmark', '*')
     kwargs.setdefault('browser', 'chrome')
@@ -47,7 +47,7 @@ class MemoryAlert(_MemoryAlert):
     return super(MemoryAlert, cls).__new__(cls, **kwargs)
 
   def __str__(self):
-    return '/'.join([self.master, self.builder, self.benchmark, self.metric,
+    return '/'.join([self.main, self.builder, self.benchmark, self.metric,
                      self.story])
 
   @property
@@ -130,26 +130,26 @@ def main():
   ## Mobile ##
 
   # Alerts for system_health.memory_mobile.
-  for master in ('ChromiumPerf', 'ClankInternal'):
+  for main in ('ChromiumPerf', 'ClankInternal'):
     for browser in ('chrome', 'webview'):
       for alert in DEFAULT_ALERTS + ANDROID_ALERTS:
         alerts.append(alert.Clone(
             benchmark='system_health.memory_mobile',
-            master=master, browser=browser))
+            main=main, browser=browser))
 
   # Alerts for memory.top_10_mobile.
-  for master in ('ChromiumPerf', 'ClankInternal'):
+  for main in ('ChromiumPerf', 'ClankInternal'):
     for browser in ('chrome', 'webview'):
       for alert in DEFAULT_ALERTS + ANDROID_ALERTS:
         alerts.append(alert.Clone(
-            benchmark='memory.top_10_mobile', master=master, browser=browser))
+            benchmark='memory.top_10_mobile', main=main, browser=browser))
 
   # Alerts for memory.dual_browser_test.
   for browser in ('chrome', 'webview'):
     for alert in DEFAULT_ALERTS:
       alerts.append(alert.Clone(
           benchmark='memory.dual_browser_test',
-          master='ClankInternal', browser=browser))
+          main='ClankInternal', browser=browser))
 
   # Export anomaly and sheriff rotation configs.
   for config in set(a.config for a in alerts):

@@ -22,7 +22,7 @@ import urllib2
 
 
 BUILDER_STEPS_URL = ('https://chrome-infra-stats.appspot.com/_ah/api/stats/v1/'
-                     'masters/chromium.perf/%s')
+                     'mains/chromium.perf/%s')
 
 
 STEP_ACTIVE_URL = ('https://chrome-infra-stats.appspot.com/_ah/api/stats/v1/'

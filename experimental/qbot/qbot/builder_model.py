@@ -9,16 +9,16 @@ from qbot import build_model
 
 
 class Builder(object):
-  def __init__(self, master, name):
-    self._master = master
+  def __init__(self, main, name):
+    self._main = main
     self._name = name
 
   def __str__(self):
-    return '%s/%s' % (self.master, self.name)
+    return '%s/%s' % (self.main, self.name)
 
   @property
-  def master(self):
-    return self._master
+  def main(self):
+    return self._main
 
   @property
   def name(self):
@@ -26,7 +26,7 @@ class Builder(object):
 
   def IterBuilds(self, limit=None):
     """Iterate over some recent builds of this builder."""
-    params = {'master': self.master, 'builder': self.name}
+    params = {'main': self.main, 'builder': self.name}
     if limit is not None:
       params['limit'] = limit
     resp = api.MiloRequest('GetBuildbotBuildsJSON', params)

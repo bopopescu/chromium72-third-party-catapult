@@ -13,8 +13,8 @@ from common.buildbot import network
 
 class Builds(object):
 
-  def __init__(self, master_name, builder_name, url):
-    self._master_name = master_name
+  def __init__(self, main_name, builder_name, url):
+    self._main_name = main_name
     self._builder_name = builder_name
     self._url = url
 
@@ -64,12 +64,12 @@ class Builds(object):
     for build_number in build_numbers:
       url = 'builders/%s/builds/%d' % (
           urllib.quote(self._builder_name), build_number)
-      url = network.BuildUrl(self._master_name, url, use_cbe=True)
+      url = network.BuildUrl(self._main_name, url, use_cbe=True)
       try:
         builds.append(network.FetchData(url))
       except (ValueError, urlfetch.ResponseTooLargeError):
         logging.warning('Unable to fetch %s/%s build %d',
-                        self._master_name, self._builder_name, build_number)
+                        self._main_name, self._builder_name, build_number)
         continue
 
     for build_data in builds:

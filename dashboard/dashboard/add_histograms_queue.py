@@ -118,7 +118,7 @@ def _PrewarmGets(params):
     test_path = p['test_path']
     path_parts = test_path.split('/')
 
-    keys.add(ndb.Key('Master', path_parts[0]))
+    keys.add(ndb.Key('Main', path_parts[0]))
     keys.add(ndb.Key('Bot', path_parts[1]))
 
     test_parts = path_parts[2:]
@@ -144,7 +144,7 @@ def _ProcessRowAndHistogram(params):
     return []
 
   test_path_parts = test_path.split('/')
-  master = test_path_parts[0]
+  main = test_path_parts[0]
   bot = test_path_parts[1]
   benchmark_name = test_path_parts[2]
   histogram_name = test_path_parts[3]
@@ -153,13 +153,13 @@ def _ProcessRowAndHistogram(params):
   else:
     rest = None
   full_test_name = '/'.join(test_path_parts[2:])
-  internal_only = graph_data.Bot.GetInternalOnlySync(master, bot)
+  internal_only = graph_data.Bot.GetInternalOnlySync(main, bot)
   extra_args = GetUnitArgs(hist.unit)
 
   unescaped_story_name = _GetStoryFromDiagnosticsDict(params.get('diagnostics'))
 
   parent_test = add_point_queue.GetOrCreateAncestors(
-      master, bot, full_test_name, internal_only=internal_only,
+      main, bot, full_test_name, internal_only=internal_only,
       unescaped_story_name=unescaped_story_name,
       benchmark_description=benchmark_description, **extra_args)
   test_key = parent_test.key
@@ -181,7 +181,7 @@ def _ProcessRowAndHistogram(params):
     if rest is not None:
       suffixed_name += '/' + rest
     legacy_parent_tests[stat_name] = add_point_queue.GetOrCreateAncestors(
-        master, bot, suffixed_name, internal_only=internal_only,
+        main, bot, suffixed_name, internal_only=internal_only,
         unescaped_story_name=unescaped_story_name, **extra_args)
 
   return [
@@ -313,7 +313,7 @@ def CreateRowEntities(
 def _MakeRowDict(revision, test_path, tracing_histogram, stat_name=None):
   d = {}
   test_parts = test_path.split('/')
-  d['master'] = test_parts[0]
+  d['main'] = test_parts[0]
   d['bot'] = test_parts[1]
   d['test'] = '/'.join(test_parts[2:])
   d['revision'] = revision

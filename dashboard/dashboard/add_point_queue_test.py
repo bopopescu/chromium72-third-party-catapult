@@ -17,8 +17,8 @@ class GetOrCreateAncestorsTest(testing_common.TestCase):
     self.SetCurrentUser('foo@bar.com', is_admin=True)
 
   def testGetOrCreateAncestors_GetsExistingEntities(self):
-    master_key = graph_data.Master(id='ChromiumPerf', parent=None).put()
-    graph_data.Bot(id='win7', parent=master_key).put()
+    main_key = graph_data.Main(id='ChromiumPerf', parent=None).put()
+    graph_data.Bot(id='win7', parent=main_key).put()
     t = graph_data.TestMetadata(id='ChromiumPerf/win7/dromaeo',)
     t.UpdateSheriff()
     t.put()
@@ -38,7 +38,7 @@ class GetOrCreateAncestorsTest(testing_common.TestCase):
     # No extra TestMetadata or Bot objects should have been added to the
     # database beyond the four that were put in before the _GetOrCreateAncestors
     # call.
-    self.assertEqual(1, len(graph_data.Master.query().fetch()))
+    self.assertEqual(1, len(graph_data.Main.query().fetch()))
     self.assertEqual(1, len(graph_data.Bot.query().fetch()))
     self.assertEqual(3, len(graph_data.TestMetadata.query().fetch()))
 
@@ -47,14 +47,14 @@ class GetOrCreateAncestorsTest(testing_common.TestCase):
         'ChromiumPerf', 'win7', 'dromaeo/dom/modify')
     self.assertEqual('ChromiumPerf/win7/dromaeo/dom/modify', parent.key.id())
     # Check that all the Bot and TestMetadata entities were correctly added.
-    created_masters = graph_data.Master.query().fetch()
+    created_mains = graph_data.Main.query().fetch()
     created_bots = graph_data.Bot.query().fetch()
     created_tests = graph_data.TestMetadata.query().fetch()
-    self.assertEqual(1, len(created_masters))
+    self.assertEqual(1, len(created_mains))
     self.assertEqual(1, len(created_bots))
     self.assertEqual(3, len(created_tests))
-    self.assertEqual('ChromiumPerf', created_masters[0].key.id())
-    self.assertIsNone(created_masters[0].key.parent())
+    self.assertEqual('ChromiumPerf', created_mains[0].key.id())
+    self.assertIsNone(created_mains[0].key.parent())
     self.assertEqual('win7', created_bots[0].key.id())
     self.assertEqual('ChromiumPerf', created_bots[0].key.parent().id())
     self.assertEqual('ChromiumPerf/win7/dromaeo', created_tests[0].key.id())

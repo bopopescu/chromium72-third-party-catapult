@@ -18,7 +18,7 @@ class AnomalyTest(testing_common.TestCase):
 
   def testGetTestMetadataKey_Test(self):
     a = anomaly.Anomaly(
-        test=ndb.Key('Master', 'm', 'Bot', 'b', 'Test', 't', 'Test', 't'))
+        test=ndb.Key('Main', 'm', 'Bot', 'b', 'Test', 't', 'Test', 't'))
     k = a.GetTestMetadataKey()
     self.assertEqual('TestMetadata', k.kind())
     self.assertEqual('m/b/t/t', k.id())
@@ -37,10 +37,10 @@ class AnomalyTest(testing_common.TestCase):
     self.assertIsNone(k)
 
   def testGetAnomaliesForTest(self):
-    old_style_key1 = utils.OldStyleTestKey('master/bot/test1/metric')
-    new_style_key1 = utils.TestMetadataKey('master/bot/test1/metric')
-    old_style_key2 = utils.OldStyleTestKey('master/bot/test2/metric')
-    new_style_key2 = utils.TestMetadataKey('master/bot/test2/metric')
+    old_style_key1 = utils.OldStyleTestKey('main/bot/test1/metric')
+    new_style_key1 = utils.TestMetadataKey('main/bot/test1/metric')
+    old_style_key2 = utils.OldStyleTestKey('main/bot/test2/metric')
+    new_style_key2 = utils.TestMetadataKey('main/bot/test2/metric')
     anomaly.Anomaly(id="old_1", test=old_style_key1).put()
     anomaly.Anomaly(id="old_1a", test=old_style_key1).put()
     anomaly.Anomaly(id="old_2", test=old_style_key2).put()
@@ -63,9 +63,9 @@ class AnomalyTest(testing_common.TestCase):
   def testComputedTestProperties(self):
     anomaly.Anomaly(
         id="foo",
-        test=utils.TestKey('master/bot/benchmark/metric/page')).put()
+        test=utils.TestKey('main/bot/benchmark/metric/page')).put()
     a = ndb.Key('Anomaly', 'foo').get()
-    self.assertEqual(a.master_name, 'master')
+    self.assertEqual(a.main_name, 'main')
     self.assertEqual(a.bot_name, 'bot')
     self.assertEqual(a.benchmark_name, 'benchmark')
 
@@ -73,7 +73,7 @@ class AnomalyTest(testing_common.TestCase):
                      timestamp=None,
                      bug_id=None,
                      sheriff_name=None,
-                     test='master/bot/test_suite/measurement/test_case',
+                     test='main/bot/test_suite/measurement/test_case',
                      start_revision=0,
                      end_revision=100,
                      display_start=0,
@@ -114,13 +114,13 @@ class AnomalyTest(testing_common.TestCase):
     self.assertEqual(1, len(anomalies))
     self.assertEqual('android', anomalies[0].bot_name)
 
-  def testMaster(self):
+  def testMain(self):
     self._CreateAnomaly()
     self._CreateAnomaly(test='adept/android/lodging/assessment/story')
     anomalies, _, _ = anomaly.Anomaly.QueryAsync(
-        master_name='adept').get_result()
+        main_name='adept').get_result()
     self.assertEqual(1, len(anomalies))
-    self.assertEqual('adept', anomalies[0].master_name)
+    self.assertEqual('adept', anomalies[0].main_name)
 
   def testTestSuite(self):
     self._CreateAnomaly()
@@ -257,9 +257,9 @@ class AnomalyTest(testing_common.TestCase):
     self._CreateAnomaly(timestamp=datetime.datetime.utcfromtimestamp(59))
     self._CreateAnomaly(timestamp=datetime.datetime.utcfromtimestamp(61))
     self._CreateAnomaly(timestamp=datetime.datetime.utcfromtimestamp(61),
-                        test='master/bot/test_suite/measurement/test_case2')
+                        test='main/bot/test_suite/measurement/test_case2')
     anomalies, _, _ = anomaly.Anomaly.QueryAsync(
-        test='master/bot/test_suite/measurement/test_case2',
+        test='main/bot/test_suite/measurement/test_case2',
         min_timestamp=datetime.datetime.utcfromtimestamp(60)).get_result()
     self.assertEqual(1, len(anomalies))
     self.assertEqual(datetime.datetime.utcfromtimestamp(61),

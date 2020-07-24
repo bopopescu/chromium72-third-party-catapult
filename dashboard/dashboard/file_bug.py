@@ -408,7 +408,7 @@ def _AssignBugToCLAuthor(bug_id, alert, service):
     # This is a commit position, need the git hash.
     result = crrev_service.GetNumbering(
         number=rev,
-        numbering_identifier='refs/heads/master',
+        numbering_identifier='refs/heads/main',
         numbering_type='COMMIT_POSITION',
         project='chromium',
         repo='chromium/src')

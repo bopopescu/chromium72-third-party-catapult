@@ -113,9 +113,9 @@ class ListTestSuitesTest(testing_common.TestCase):
   def testPost_InternalOnly(self):
     self.SetCurrentUser('internal@chromium.org')
     self._AddSampleData()
-    master_key = ndb.Key('Master', 'Chromium')
+    main_key = ndb.Key('Main', 'Chromium')
     graph_data.Bot(
-        id='internal_mac', parent=master_key, internal_only=True).put()
+        id='internal_mac', parent=main_key, internal_only=True).put()
     t = graph_data.TestMetadata(
         id='Chromium/internal_mac/internal_test', internal_only=True)
     t.UpdateSheriff()
@@ -182,7 +182,7 @@ class ListTestSuitesTest(testing_common.TestCase):
         },
         update_test_suites.FetchCachedTestSuites())
 
-  def testFetchSuites_DifferentMasters(self):
+  def testFetchSuites_DifferentMains(self):
     # If the cache is not set at all, then FetchCachedTestSuites
     # just updates the cache before returning the list.
     self._AddSampleData()
@@ -328,7 +328,7 @@ class ListTestSuitesTest(testing_common.TestCase):
 
   def testPartialTestSuites(self):
     testing_common.AddTests(
-        ['master'],
+        ['main'],
         ['bot'],
         {
             'TEST_PARTIAL_TEST_SUITE': {

@@ -77,20 +77,20 @@ class FileBugTest(testing_common.TestCase):
     file_bug.issue_tracker_service.IssueTrackerService = self.original_service
     self.UnsetCurrentUser()
 
-  def _AddSampleAlerts(self, master='ChromiumPerf', has_commit_positions=True):
+  def _AddSampleAlerts(self, main='ChromiumPerf', has_commit_positions=True):
     """Adds sample data and returns a dict of rev to anomaly key."""
-    # Add sample sheriff, masters, bots, and tests.
+    # Add sample sheriff, mains, bots, and tests.
     sheriff_key = sheriff.Sheriff(
         id='Sheriff',
         labels=['Performance-Sheriff', 'Cr-Blink-Javascript']).put()
-    testing_common.AddTests([master], ['linux'], {
+    testing_common.AddTests([main], ['linux'], {
         'scrolling': {
             'first_paint': {},
             'mean_frame_time': {},
         }
     })
-    test_path1 = '%s/linux/scrolling/first_paint' % master
-    test_path2 = '%s/linux/scrolling/mean_frame_time' % master
+    test_path1 = '%s/linux/scrolling/first_paint' % main
+    test_path2 = '%s/linux/scrolling/mean_frame_time' % main
     test_key1 = utils.TestKey(test_path1)
     test_key2 = utils.TestKey(test_path2)
     anomaly_key1 = self._AddAnomaly(111995, 112005, test_key1, sheriff_key)
@@ -111,7 +111,7 @@ class FileBugTest(testing_common.TestCase):
     commit positions. This tests the _MilestoneLabel function to make sure
     it will update the end_revision if r_commit_pos is found.
     """
-    # Add sample sheriff, masters, bots, and tests. Doesn't need to be Clank.
+    # Add sample sheriff, mains, bots, and tests. Doesn't need to be Clank.
     sheriff_key = sheriff.Sheriff(
         id='Sheriff',
         labels=['Performance-Sheriff', 'Cr-Blink-Javascript']).put()
@@ -203,12 +203,12 @@ class FileBugTest(testing_common.TestCase):
       mock.MagicMock(return_value={'issue_id': 123, 'issue_url': 'foo.com'}))
   def _PostSampleBug(self,
                      has_commit_positions=True,
-                     master='ChromiumPerf',
+                     main='ChromiumPerf',
                      is_single_rev=False):
-    if master == 'ClankInternal':
+    if main == 'ClankInternal':
       alert_keys = self._AddSampleClankAlerts()
     else:
-      alert_keys = self._AddSampleAlerts(master, has_commit_positions)
+      alert_keys = self._AddSampleAlerts(main, has_commit_positions)
     if is_single_rev:
       alert_keys = alert_keys[2].urlsafe()
     else:
@@ -388,7 +388,7 @@ class FileBugTest(testing_common.TestCase):
             "repository_url": "https://chromium.googlesource.com/chromium/src"
         }})
     self.service.bug_id = 277761
-    response = self._PostSampleBug(is_single_rev=True, master='ClankInternal')
+    response = self._PostSampleBug(is_single_rev=True, main='ClankInternal')
 
     # The response page should have a bug number.
     self.assertIn('277761', response.body)
@@ -415,7 +415,7 @@ class FileBugTest(testing_common.TestCase):
             "repository_url": "https://chromium.googlesource.com/chromium/src"
         }})
     self.service.bug_id = 277761
-    response = self._PostSampleBug(is_single_rev=True, master='FakeMaster')
+    response = self._PostSampleBug(is_single_rev=True, main='FakeMain')
 
     # The response page should have a bug number.
     self.assertIn('277761', response.body)
@@ -439,7 +439,7 @@ class FileBugTest(testing_common.TestCase):
               mock.MagicMock(return_value={
                   'author': {'email': 'foo@bar.com'},
                   'message': 'My first commit!'}))
-  def testGet_WithFinish_CreatesBugSingleRevDifferentMasterOwner(self):
+  def testGet_WithFinish_CreatesBugSingleRevDifferentMainOwner(self):
     # When a POST request is sent with keys specified and with the finish
     # parameter given, an issue will be created using the issue tracker
     # API, and the anomalies will be updated, and a response page will
@@ -450,7 +450,7 @@ class FileBugTest(testing_common.TestCase):
             "repository_url": "https://chromium.googlesource.com/chromium/src"
         }})
     self.service.bug_id = 277761
-    response = self._PostSampleBug(is_single_rev=True, master='Foo')
+    response = self._PostSampleBug(is_single_rev=True, main='Foo')
 
     # The response page should have a bug number.
     self.assertIn('277761', response.body)
@@ -530,7 +530,7 @@ class FileBugTest(testing_common.TestCase):
     # which revision to check. There are 3 branching points to ensure we are
     # actually changing the revision that is checked to r_commit_pos instead
     # of just displaying the highest one (previous behavior).
-    self._PostSampleBug(master='ClankInternal')
+    self._PostSampleBug(main='ClankInternal')
     self.assertIn('M-2', self.service.new_bug_kwargs['labels'])
 
   @mock.patch.object(utils, 'ServiceAccountHttp', mock.MagicMock())

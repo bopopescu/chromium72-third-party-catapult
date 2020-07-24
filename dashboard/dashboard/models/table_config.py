@@ -60,7 +60,7 @@ def CreateTableConfig(name, bots, tests, layout, username, override):
 
   Args:
     name: User friendly name for the report.
-    bots: List of master/bot pairs.
+    bots: List of main/bot pairs.
     tests: List of test paths.
     layout: JSON serializable layout for the table.
     username: Email address of user creating the report.
@@ -75,17 +75,17 @@ def CreateTableConfig(name, bots, tests, layout, username, override):
     for bot in bots:
       if '/' in bot:
         bot_name = bot.split('/')[1]
-        master_name = bot.split('/')[0]
-        entity_key = ndb.Key('Master', master_name, 'Bot', bot_name)
+        main_name = bot.split('/')[0]
+        entity_key = ndb.Key('Main', main_name, 'Bot', bot_name)
         entity = entity_key.get()
         if entity:
           valid_bots.append(entity_key)
           if entity.internal_only:
             internal_only = True
         else:
-          raise BadRequestError('Invalid Master/Bot: %s' % bot)
+          raise BadRequestError('Invalid Main/Bot: %s' % bot)
       else:
-        raise BadRequestError('Invalid Master/Bot: %s' % bot)
+        raise BadRequestError('Invalid Main/Bot: %s' % bot)
 
     table_check = ndb.Key('TableConfig', name).get()
     if table_check and not override:

@@ -43,7 +43,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
         update_test_suites.TEST_SUITES_2_CACHE_KEY, datastore_hooks.INTERNAL)
     stored_object.Set(internal_key, ['internal'])
     testing_common.AddTests(
-        ['master'],
+        ['main'],
         ['bot'],
         {
             'internal': {
@@ -52,7 +52,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
                 },
             },
         })
-    test = utils.TestKey('master/bot/internal/measurement/test_case').get()
+    test = utils.TestKey('main/bot/internal/measurement/test_case').get()
     test.has_rows = True
     test.internal_only = True
     test.put()
@@ -71,7 +71,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
 
     expected = {
         'measurements': ['measurement'],
-        'bots': ['master:bot'],
+        'bots': ['main:bot'],
         'cases': ['test_case'],
     }
     self.SetCurrentUser('internal@chromium.org')
@@ -84,7 +84,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
         update_test_suites.TEST_SUITES_2_CACHE_KEY, datastore_hooks.EXTERNAL)
     stored_object.Set(external_key, ['suite'])
     testing_common.AddTests(
-        ['master'],
+        ['main'],
         ['a', 'b'],
         {
             'suite': {
@@ -97,18 +97,18 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
         })
     for bot in 'ab':
       for case in 'xyz':
-        test = utils.TestKey('master/%s/suite/measurement/%s' %
+        test = utils.TestKey('main/%s/suite/measurement/%s' %
                              (bot, case)).get()
         test.has_rows = True
         test.put()
     histogram.SparseDiagnostic(
-        test=utils.TestKey('master/a/suite'),
+        test=utils.TestKey('main/a/suite'),
         name=reserved_infos.TAG_MAP.name,
         end_revision=sys.maxint,
         data=tag_map.TagMap(
             {'tagsToStoryNames': {'j': ['x']}}).AsDict()).put()
     histogram.SparseDiagnostic(
-        test=utils.TestKey('master/b/suite'),
+        test=utils.TestKey('main/b/suite'),
         name=reserved_infos.TAG_MAP.name,
         end_revision=sys.maxint,
         data=tag_map.TagMap(
@@ -120,7 +120,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
 
     expected = {
         'measurements': ['measurement'],
-        'bots': ['master:a', 'master:b'],
+        'bots': ['main:a', 'main:b'],
         'cases': ['x', 'y', 'z'],
         'caseTags': {'j': ['x', 'y'], 'k': ['y']},
     }
@@ -133,7 +133,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
         update_test_suites.TEST_SUITES_2_CACHE_KEY, datastore_hooks.EXTERNAL)
     stored_object.Set(external_key, ['TEST_PARTIAL_TEST_SUITE:COMPOSITE'])
     testing_common.AddTests(
-        ['master'],
+        ['main'],
         ['bot'],
         {
             'TEST_PARTIAL_TEST_SUITE': {
@@ -144,7 +144,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
                 },
             },
         })
-    test = utils.TestKey('master/bot/TEST_PARTIAL_TEST_SUITE/COMPOSITE/' +
+    test = utils.TestKey('main/bot/TEST_PARTIAL_TEST_SUITE/COMPOSITE/' +
                          'measurement/test_case').get()
     test.has_rows = True
     test.put()
@@ -153,7 +153,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
     self.ExecuteDeferredTasks('default')
     expected = {
         'measurements': ['measurement'],
-        'bots': ['master:bot'],
+        'bots': ['main:bot'],
         'cases': ['test_case'],
     }
     actual = update_test_suite_descriptors.FetchCachedTestSuiteDescriptor(
@@ -165,7 +165,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
         update_test_suites.TEST_SUITES_2_CACHE_KEY, datastore_hooks.EXTERNAL)
     stored_object.Set(external_key, ['unparsed'])
     testing_common.AddTests(
-        ['master'],
+        ['main'],
         ['bot'],
         {
             'unparsed': {
@@ -176,7 +176,7 @@ class UpdateTestSuiteDescriptorsTest(testing_common.TestCase):
                 },
             },
         })
-    test = utils.TestKey('master/bot/unparsed/a/b/c').get()
+    test = utils.TestKey('main/bot/unparsed/a/b/c').get()
     test.has_rows = True
     test.put()
 

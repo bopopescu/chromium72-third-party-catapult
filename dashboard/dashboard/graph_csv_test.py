@@ -25,10 +25,10 @@ class GraphCsvTest(testing_common.TestCase):
     self.SetCurrentUser('foo@bar.com', is_admin=True)
 
   def _AddMockData(self):
-    master = graph_data.Master(id='ChromiumPerf').put()
+    main = graph_data.Main(id='ChromiumPerf').put()
     bots = []
     for name in ['win7', 'mac']:
-      bot = graph_data.Bot(id=name, parent=master).put()
+      bot = graph_data.Bot(id=name, parent=main).put()
       bots.append(bot)
       t = graph_data.TestMetadata(id='ChromiumPerf/%s/dromaeo' % name)
       t.UpdateSheriff()
@@ -45,10 +45,10 @@ class GraphCsvTest(testing_common.TestCase):
                        error=(i + 5)).put()
 
   def _AddMockInternalData(self):
-    master = graph_data.Master(id='ChromiumPerf').put()
+    main = graph_data.Main(id='ChromiumPerf').put()
     bots = []
     for name in ['win7', 'mac']:
-      bot = graph_data.Bot(id=name, parent=master, internal_only=True).put()
+      bot = graph_data.Bot(id=name, parent=main, internal_only=True).put()
       bots.append(bot)
       t = graph_data.TestMetadata(
           id='ChromiumPerf/%s/dromaeo' % name, internal_only=True)

@@ -87,7 +87,7 @@ class ReportTemplateTest(testing_common.TestCase):
     test = graph_data.TestMetadata(
         has_rows=True,
         internal_only=True,
-        id='master/internalbot/internalsuite/measure',
+        id='main/internalbot/internalsuite/measure',
         units='units')
     test.put()
     report_template.PutTemplate(
@@ -95,7 +95,7 @@ class ReportTemplateTest(testing_common.TestCase):
             'rows': [
                 {
                     'testSuites': ['internalsuite'],
-                    'bots': ['master:internalbot'],
+                    'bots': ['main:internalbot'],
                     'measurement': 'measure',
                     'testCases': [],
                 },
@@ -112,7 +112,7 @@ class ReportTemplateTest(testing_common.TestCase):
             'rows': [
                 {
                     'testSuites': ['externalsuite'],
-                    'bots': ['master:externalbot'],
+                    'bots': ['main:externalbot'],
                     'measurement': 'measure',
                     'testCases': [],
                 },

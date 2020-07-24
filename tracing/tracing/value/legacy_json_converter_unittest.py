@@ -12,7 +12,7 @@ class LegacyJsonConverterUnittest(unittest.TestCase):
 
   def testConvertBasic(self):
     dicts = [{
-        'master': 'Master',
+        'main': 'Main',
         'bot': 'Bot',
         'test': 'Suite/Metric',
         'revision': 1234,
@@ -28,8 +28,8 @@ class LegacyJsonConverterUnittest(unittest.TestCase):
     self.assertEqual(h.name, 'Metric')
     self.assertEqual(len(h.diagnostics), 4)
 
-    masters = h.diagnostics[reserved_infos.MASTERS.name]
-    self.assertEqual(masters.GetOnlyElement(), 'Master')
+    mains = h.diagnostics[reserved_infos.MASTERS.name]
+    self.assertEqual(mains.GetOnlyElement(), 'Main')
 
     bots = h.diagnostics[reserved_infos.BOTS.name]
     self.assertEqual(bots.GetOnlyElement(), 'Bot')
@@ -45,7 +45,7 @@ class LegacyJsonConverterUnittest(unittest.TestCase):
 
   def testConvertWithStory(self):
     dicts = [{
-        'master': 'Master',
+        'main': 'Main',
         'bot': 'Bot',
         'test': 'Suite/Metric/Case',
         'revision': 1234,
@@ -60,7 +60,7 @@ class LegacyJsonConverterUnittest(unittest.TestCase):
 
   def testConvertWithRCommitPos(self):
     dicts = [{
-        'master': 'Master',
+        'main': 'Main',
         'bot': 'Bot',
         'test': 'Suite/Metric/Case',
         'revision': 1234,
@@ -79,7 +79,7 @@ class LegacyJsonConverterUnittest(unittest.TestCase):
 
   def testConvertWithDifferentRCommitPos(self):
     dicts = [{
-        'master': 'Master',
+        'main': 'Main',
         'bot': 'Bot',
         'test': 'Suite/Metric/Case',
         'revision': 1234,
@@ -99,7 +99,7 @@ class LegacyJsonConverterUnittest(unittest.TestCase):
 
   def testConvertUsesPointIdIfSupplementalColumnsButNoRCommitPos(self):
     dicts = [{
-        'master': 'Master',
+        'main': 'Main',
         'bot': 'Bot',
         'test': 'Suite/Metric/Case',
         'revision': 1234,

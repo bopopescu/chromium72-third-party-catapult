@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 from common.buildbot.builder import Builders
-from common.buildbot.slave import Slaves
+from common.buildbot.subordinate import Subordinates
 
 
 PENDING = None

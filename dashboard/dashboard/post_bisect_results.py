@@ -33,7 +33,7 @@ class PostBisectResultsHandler(post_data_handler.PostDataHandler):
     Bisect results come from a "data" parameter, which is a JSON encoding of a
     dictionary.
 
-    The required fields are "master", "bot", "test".
+    The required fields are "main", "bot", "test".
 
     Request parameters:
       data: JSON encoding of a dictionary.

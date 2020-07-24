@@ -9,7 +9,7 @@ class Build(object):
 
   def __init__(self, data, builder_url):
     self._number = data['number']
-    self._slave_name = data['slave']
+    self._subordinate_name = data['subordinate']
     self._status = data['results']
     self._start_time, self._end_time = data['times']
     self._url = '%s/builds/%d' % (builder_url, self._number)
@@ -38,8 +38,8 @@ class Build(object):
     return self._url
 
   @property
-  def slave_name(self):
-    return self._slave_name
+  def subordinate_name(self):
+    return self._subordinate_name
 
   @property
   def status(self):

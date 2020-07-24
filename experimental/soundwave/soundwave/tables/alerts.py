@@ -11,7 +11,7 @@ COLUMN_TYPES = (
     ('timestamp', 'datetime64[ns]'),  # when the alert was created
     ('test_suite', str),  # benchmark name ('loading.mobile')
     ('measurement', str),  # metric name ('timeToFirstContentfulPaint')
-    ('bot', str),  # master/builder name ('ChromiumPerf.android-nexus5')
+    ('bot', str),  # main/builder name ('ChromiumPerf.android-nexus5')
     ('test_case', str),  # story name ('Wikipedia')
     ('start_revision', str),  # git hash or commit position before anomaly
     ('end_revision', str),  # git hash or commit position after anomaly
@@ -52,7 +52,7 @@ def _RowFromJson(data):
     # Alert was on a summary metric, i.e. a summary of the measurement across
     # multiple test cases. Therefore, no test_case is asociated with it.
     data['measurement'], data['test_case'] = raw_test, None
-  data['bot'] = '/'.join([data.pop('master'), data.pop('bot')])
+  data['bot'] = '/'.join([data.pop('main'), data.pop('bot')])
 
   # Separate bug_id from alert status.
   data['status'] = _CODE_TO_STATUS.get(data['bug_id'], 'triaged')
